@@ -29,6 +29,9 @@ public class EventRegistrationService {
     @Autowired
     private QuitEventListener quitEventListener;
 
+    @Autowired
+    private PermissionDeniedEventListener permissionDeniedEventListener;
+
     @PostConstruct
     public void init() {
         eventBus.setCheckInheritance(false);
@@ -41,5 +44,6 @@ public class EventRegistrationService {
         eventBus.registerEventListener(quitEventListener);
         eventBus.registerEventListener(squeryEventListener);
         eventBus.registerEventListener(youAreServiceEventListener);
+        eventBus.registerEventListener(permissionDeniedEventListener);
     }
 }
