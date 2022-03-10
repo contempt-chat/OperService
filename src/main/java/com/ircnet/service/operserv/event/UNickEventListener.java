@@ -2,6 +2,7 @@ package com.ircnet.service.operserv.event;
 
 import com.ircnet.library.common.event.AbstractEventListener;
 import com.ircnet.library.service.event.UNickEvent;
+import com.ircnet.service.operserv.DNSBL.DNSBLervice;
 import com.ircnet.service.operserv.IpAddressFamily;
 import com.ircnet.service.operserv.Util;
 import com.ircnet.service.operserv.irc.IRCUser;
@@ -24,6 +25,9 @@ public class UNickEventListener extends AbstractEventListener<UNickEvent> {
 
     @Autowired
     private KLineService klineService;
+
+    @Autowired
+    private DNSBLervice dblService;
 
     @Value("${service.channel}")
     private String serviceChannel;
@@ -54,7 +58,7 @@ public class UNickEventListener extends AbstractEventListener<UNickEvent> {
         IpAddressFamily ipAddressFamily = Util.findAddressFamily(user.getIpAddress());
 
         if(ipAddressFamily != null) {
-            user.setConnectionType(ipAddressFamily);
+            user.setIpAddressFamily(ipAddressFamily);
         }
         else {
             LOGGER.error("Could not determine address type for '{}'", user.getIpAddress());
@@ -75,6 +79,20 @@ public class UNickEventListener extends AbstractEventListener<UNickEvent> {
             LOGGER.info(message);
             ircConnectionService.notice(event.getIRCConnection(), serviceChannel, message);
             klineService.enforceKLine(kline, user.getSid());
+        }
+
+        /*
+         * Check if the IP address is listed in DNBLs, if:
+         *  1. it is an IPv4 (what about IPv6 support?)
+         *  2. the IPv4 is not a private or cloaked
+         *  3. if the user is not logged in
+         */
+        if(user.getIpAddressFamily() == IpAddressFamily.IPV4
+            && "~-^".contains(String.valueOf(user.getUser().charAt(0)))
+            && !Util.isPrivateIPv4Address(user.getIpAddress())
+            && "*".equals(user.getAccount())
+            && !user.getIpAddress().equals("255.255.255.255")) {
+            dblService.check(user);
         }
     }
 }

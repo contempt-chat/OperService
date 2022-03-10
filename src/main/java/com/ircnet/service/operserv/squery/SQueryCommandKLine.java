@@ -146,7 +146,8 @@ public class SQueryCommandKLine extends SQueryCommand {
                     tags.get("account"),
                     durationSeconds,
                     sid,
-                    dryRun);
+                    dryRun,
+                    false);
         }
         catch (ParseException e) {
             LOGGER.debug("Failed to parse '{}' from {}", message, from, e);

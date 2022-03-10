@@ -1,6 +1,7 @@
 package com.ircnet.service.operserv;
 
 import com.ircnet.library.service.IRCServiceTask;
+import com.ircnet.service.operserv.DNSBL.DNSBLervice;
 import com.ircnet.service.operserv.kline.KLine;
 import com.ircnet.service.operserv.kline.KLineService;
 import com.ircnet.service.operserv.tor.TorService;
@@ -32,6 +33,9 @@ public class ScheduledTasks {
     @Autowired
     @Qualifier("klineList")
     private List<KLine> klineList;
+
+    @Autowired
+    private DNSBLervice dblService;
 
     /**
      * Downloads new lists of Tor exit nodes and creates K-Lines.

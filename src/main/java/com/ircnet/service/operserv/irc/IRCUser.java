@@ -109,11 +109,11 @@ public class IRCUser {
     this.ipAddress = ipAddress;
   }
 
-  public IpAddressFamily getConnectionType() {
+  public IpAddressFamily getIpAddressFamily() {
     return ipAddressFamily;
   }
 
-  public void setConnectionType(IpAddressFamily ipAddressFamily) {
+  public void setIpAddressFamily(IpAddressFamily ipAddressFamily) {
     this.ipAddressFamily = ipAddressFamily;
   }
 

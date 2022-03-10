@@ -65,9 +65,8 @@ public class KLineServiceImpl implements KLineService {
     @Value("${service.channel}")
     private String serviceChannel;
 
-
-    @Override
-    public void create(String username, String hostname, boolean isIpAddressOrRange, String reason, User from, String fromAccount, Long duration, String sid, boolean dryRun) {
+    @Override // FIXME: too many parameters, rewrite this method
+    public void create(String username, String hostname, boolean isIpAddressOrRange, String reason, User from, String fromAccount, Long duration, String sid, boolean dryRun, boolean isLocal) {
         KLineDTO klineDTO = new KLineDTO();
         klineDTO.setUsername(username);
         klineDTO.setHostname(hostname);
@@ -82,7 +81,7 @@ public class KLineServiceImpl implements KLineService {
             klineDTO.setSid(sid);
         }
 
-        if (!dryRun) {
+        if (!dryRun && !isLocal) {
             WebClient.create(apiURL)
                     .post()
                     .headers(headers -> headers.setBasicAuth(apiUsername, apiPassword))
@@ -110,7 +109,6 @@ public class KLineServiceImpl implements KLineService {
                     .subscribe(
                             response -> {
                                 processCreate(from, response, duration, dryRun);
-                                persistenceService.save();
                             }
                     );
         }
@@ -154,6 +152,10 @@ public class KLineServiceImpl implements KLineService {
         ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message.toString());
 
         enforceKLine(kline, from, false, dryRun);
+
+        if(!dryRun) {
+            persistenceService.save();
+        }
     }
 
     @Override

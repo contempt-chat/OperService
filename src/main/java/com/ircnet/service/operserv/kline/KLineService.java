@@ -22,8 +22,9 @@ public interface KLineService {
    * @param duration Duration in seconds when this K-Line expires, or null
    * @param sid A SID pattern if the K-Line is not global, otherwise null
    * @param dryRun true if this is just a dry run, only simulates K-Line and show who would get banned
+   * @param isLocal true if the K-Line should not be sent to the webservice
    */
-  void create(String username, String hostname, boolean isIpAddressOrRange, String reason, User from, String fromAccount, Long duration, String sid, boolean dryRun);
+  void create(String username, String hostname, boolean isIpAddressOrRange, String reason, User from, String fromAccount, Long duration, String sid, boolean dryRun, boolean isLocal);
 
   /**
    * Finds the first K-Line that matches the given user.

@@ -30,6 +30,7 @@
         </Root>
 
         <Logger name="com.ircnet" level="info"></Logger>
+        <Logger name="com.ircnet.service.operserv" level="debug"></Logger>
     </Loggers>
 
 </Configuration>

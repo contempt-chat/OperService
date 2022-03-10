@@ -3,6 +3,7 @@ package com.ircnet.service.operserv;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.validator.routines.InetAddressValidator;
+import org.springframework.security.web.util.matcher.IpAddressMatcher;
 // Checked (FIXME)
 /**
  * Helper methods.
@@ -104,21 +105,41 @@ public class Util {
         StringBuilder result = new StringBuilder();
 
         if (weeks != 0) {
-            result.append(String.format(" %d %s", weeks, weeks == 1 ? " week" : " weeks"));
+            result.append(String.format(" %d %s", weeks, weeks == 1 ? "week" : "weeks"));
         }
         if (days != 0) {
-            result.append(String.format(" %d %s", days, days == 1 ? " day" : " days"));
+            result.append(String.format(" %d %s", days, days == 1 ? "day" : "days"));
         }
         if (hours != 0) {
-            result.append(String.format(" %d %s", hours, hours == 1 ? " hour" : " hours"));
+            result.append(String.format(" %d %s", hours, hours == 1 ? "hour" : "hours"));
         }
         if (minutes != 0) {
-            result.append(String.format(" %d %s", minutes, minutes == 1 ? " minute" : " minutes"));
+            result.append(String.format(" %d %s", minutes, minutes == 1 ? "minute" : "minutes"));
         }
         if (seconds != 0) {
-            result.append(String.format(" %d %s", seconds, seconds == 1 ? " second" : " seconds"));
+            result.append(String.format(" %d %s", seconds, seconds == 1 ? "second" : "seconds"));
         }
 
         return result.toString();
+    }
+
+    /**
+     * Checks if an IPv4 address is a local or private IP address.
+     *
+     * @param ipAddress An IPv4 address
+     * @return true if the IPv4 address is local or private
+     */
+    public static boolean isPrivateIPv4Address(String ipAddress) {
+        final String[] privateRanges = { "127.0.0.0/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16" };
+
+        for(String privateRange : privateRanges) {
+            IpAddressMatcher ipAddressMatcher = new IpAddressMatcher(privateRange);
+
+            if (ipAddressMatcher.matches(ipAddress)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

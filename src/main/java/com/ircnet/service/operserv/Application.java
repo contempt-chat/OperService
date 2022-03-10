@@ -70,7 +70,7 @@ public class Application implements CommandLineRunner {
 
         // Load data from file
         persistenceService.load();
-persistenceService.save();
+
         // Load authorized SASL accounts from webservice on first start
         if(authorizedAccounts.isEmpty()) {
             accountService.loadFromAPI(null);

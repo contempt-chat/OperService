@@ -18,6 +18,7 @@ import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -176,7 +177,7 @@ public class ServiceConfiguration {
      */
     @Bean("userMapByUID")
     public Map<String, IRCUser> userMapByUID() {
-        return new HashMap<>();
+        return new ConcurrentHashMap<>();
     }
 
     /**
@@ -184,7 +185,7 @@ public class ServiceConfiguration {
      */
     @Bean("userMapByNick")
     public Map<String, IRCUser> userMapByNick() {
-        return new HashMap<>();
+        return new ConcurrentHashMap<>();
     }
 
     /**
