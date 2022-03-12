@@ -142,4 +142,24 @@ public class Util {
 
         return false;
     }
+
+    /**
+     * Checks if an IPv6 address is a local or private IP address.
+     *
+     * @param ipAddress An IPv6 address
+     * @return true if the IPv6 address is local or private
+     */
+    public static boolean isPrivateIPv6Address(String ipAddress) {
+        final String[] privateRanges = { "::1/128", "fe80::/10", "fec0::/10", "fc00::/7", "ff00::/8" };
+
+        for(String privateRange : privateRanges) {
+            IpAddressMatcher ipAddressMatcher = new IpAddressMatcher(privateRange);
+
+            if (ipAddressMatcher.matches(ipAddress)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

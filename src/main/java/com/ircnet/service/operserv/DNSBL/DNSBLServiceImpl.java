@@ -1,5 +1,6 @@
 package com.ircnet.service.operserv.DNSBL;
 
+import com.ircnet.service.operserv.IpAddressFamily;
 import com.ircnet.service.operserv.irc.IRCUser;
 import com.ircnet.service.operserv.kline.KLineService;
 import org.apache.commons.collections.CollectionUtils;
@@ -8,12 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.xbill.DNS.Name;
-import org.xbill.DNS.TextParseException;
-import org.xbill.DNS.Type;
+import org.xbill.DNS.*;
 import org.xbill.DNS.lookup.LookupSession;
 import org.xbill.DNS.lookup.NoSuchDomainException;
 
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -46,11 +46,11 @@ public class DNSBLServiceImpl implements DNSBLervice {
     this.executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
     this.resultMap = new ConcurrentHashMap<>();
     this.providers = new ArrayList<>();
+    this.providers.add(new DNSBLProvider("Spamhaus ZEN", "zen.spamhaus.org", "You are listed in Spamhaus ZEN blocklist"));
     this.providers.add(new DNSBLProvider("all.s5h.net", "all.s5h.net", "You are listed at all.s5h.net"));
     this.providers.add(new DNSBLProvider("DroneBL", "dnsbl.dronebl.org", "You are listed in DroneBL - http://dronebl.org/lookup?ip={ip}"));
-    this.providers.add(new DNSBLProvider("Spamhaus ZEN", "zen.spamhaus.org", "You are listed in Spamhaus ZEN blocklist"));
     this.providers.add(new DNSBLProvider("EFnet RBL", "rbl.efnetrbl.org", "https://rbl.efnetrbl.org/?i={ip}"));
-    this.providers.add(new DNSBLProvider("Tornevall", "dnsbl.tornevall.org", "You are listed Tornevall Blacklist"));
+    this.providers.add(new DNSBLProvider("Tornevall", "dnsbl.tornevall.org", "You are listed in Tornevall blacklist"));
   }
 
   @Override
@@ -87,7 +87,21 @@ public class DNSBLServiceImpl implements DNSBLervice {
       return;
     }
 
-    String reversedIpAddress = reverseIpv4Address(request.getIpAddress());
+    String reversedIpAddress;
+
+    if(request.getUser().getIpAddressFamily() == IpAddressFamily.IPV4) {
+      reversedIpAddress = reverseIPv4Address(request.getIpAddress());
+    }
+    else {
+      try {
+        reversedIpAddress = reverseIPv6Address(request.getIpAddress());
+      }
+      catch (Exception e) {
+        LOGGER.error("Could not reverse {}", request.getIpAddress());
+        return;
+      }
+    }
+
     AtomicBoolean isListed = new AtomicBoolean(false);
 
     // A map containing providers and number of resolve attempts.
@@ -195,14 +209,27 @@ public class DNSBLServiceImpl implements DNSBLervice {
 
   /**
    * Reverses an IPv4 address.
-   * Example: 127.0.0.1 comes 1.0.0.127
+   * Example: 127.0.0.1 becomes 1.0.0.127
    *
-   * @param ipAddress An IP address
-   * @return The reversed IP address
+   * @param ipAddress An IPv4 address
+   * @return The reversed IPv4 address
    */
-  private String reverseIpv4Address(String ipAddress) {
+  private String reverseIPv4Address(String ipAddress) {
     final String[] bytes = ipAddress.split("\\.");
     String reversedIpAddress = bytes[3] + "." + bytes[2] + "." + bytes[1] + "." + bytes[0];
     return reversedIpAddress;
+  }
+
+  /**
+   * Reverses an IPv6 address.
+   * Example: ::1 comes 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0
+   *
+   * @param ipAddress An IPv6 address
+   * @return The reversed IPv6 address
+   */
+  private String reverseIPv6Address(String ipAddress) throws UnknownHostException {
+    return ReverseMap.fromAddress(ipAddress, Address.IPv6)
+            .toString()
+            .replace(".ip6.arpa.", "");
   }
 }
