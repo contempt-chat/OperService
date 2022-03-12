@@ -2,7 +2,7 @@ package com.ircnet.service.operserv.event;
 
 import com.ircnet.library.common.event.AbstractEventListener;
 import com.ircnet.library.service.event.UNickEvent;
-import com.ircnet.service.operserv.DNSBL.DNSBLervice;
+import com.ircnet.service.operserv.dnsbl.DNSBLervice;
 import com.ircnet.service.operserv.IpAddressFamily;
 import com.ircnet.service.operserv.Util;
 import com.ircnet.service.operserv.irc.IRCUser;

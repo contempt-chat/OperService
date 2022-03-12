@@ -1,4 +1,4 @@
-package com.ircnet.service.operserv.DNSBL;
+package com.ircnet.service.operserv.dnsbl;
 
 import com.ircnet.service.operserv.irc.IRCUser;
 

@@ -1,7 +1,6 @@
 package com.ircnet.service.operserv;
 
 import com.ircnet.library.service.IRCServiceTask;
-import com.ircnet.service.operserv.DNSBL.DNSBLervice;
 import com.ircnet.service.operserv.kline.KLine;
 import com.ircnet.service.operserv.kline.KLineService;
 import com.ircnet.service.operserv.tor.TorService;
