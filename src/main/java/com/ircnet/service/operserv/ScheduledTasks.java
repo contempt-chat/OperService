@@ -34,9 +34,6 @@ public class ScheduledTasks {
     @Qualifier("klineList")
     private List<KLine> klineList;
 
-    @Autowired
-    private DNSBLervice dblService;
-
     /**
      * Downloads new lists of Tor exit nodes and creates K-Lines.
      */

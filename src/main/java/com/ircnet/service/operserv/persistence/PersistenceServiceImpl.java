@@ -9,17 +9,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
 public class PersistenceServiceImpl implements PersistenceService {
   private static final String KLINE_FILE_NAME = "data.json";
   private static final Logger LOGGER = LoggerFactory.getLogger(PersistenceServiceImpl.class);
+
+  private boolean savePending;
 
   @Autowired
   @Qualifier("klineList")
@@ -35,6 +40,23 @@ public class PersistenceServiceImpl implements PersistenceService {
   @Autowired
   @Lazy
   private KLineService klineService;
+
+  @Autowired
+  private TaskScheduler taskScheduler;
+
+  @Override
+  public void scheduleSave() {
+    if(!this.savePending) {
+      this.savePending = true;
+      taskScheduler.schedule(
+              () -> {
+                save();
+                this.savePending = false;
+              },
+              new Date(OffsetDateTime.now().plusSeconds(10).toInstant().toEpochMilli())
+      );
+    }
+  }
 
   @Override
   public void save() {

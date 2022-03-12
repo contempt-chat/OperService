@@ -10,6 +10,11 @@ public interface PersistenceService {
   void save();
 
   /**
+   * Schedules next execute of save() after a configured delay.
+   */
+  void scheduleSave();
+
+  /**
    * Loads data (K-Lines, authorized SASL accounts) from a file.
    */
   void load();

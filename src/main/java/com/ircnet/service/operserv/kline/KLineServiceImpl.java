@@ -154,7 +154,7 @@ public class KLineServiceImpl implements KLineService {
         enforceKLine(kline, from, false, dryRun);
 
         if(!dryRun) {
-            persistenceService.save();
+            persistenceService.scheduleSave();
         }
     }
 
@@ -412,7 +412,7 @@ public class KLineServiceImpl implements KLineService {
                                 }
 
                                 ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
-                                persistenceService.save();
+                                persistenceService.scheduleSave();
                             }
                     );
         }
