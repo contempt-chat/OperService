@@ -53,7 +53,7 @@ public class DNSBLServiceImpl implements DNSBLervice {
     this.providers.add(new DNSBLProvider("Spamhaus ZEN", "zen.spamhaus.org", "You are listed in Spamhaus ZEN blocklist"));
     this.providers.add(new DNSBLProvider("all.s5h.net", "all.s5h.net", "You are listed at all.s5h.net"));
     this.providers.add(new DNSBLProvider("DroneBL", "dnsbl.dronebl.org", "You are listed in DroneBL - http://dronebl.org/lookup?ip={ip}"));
-    this.providers.add(new DNSBLProvider("EFnet RBL", "rbl.efnetrbl.org", "https://rbl.efnetrbl.org/?i={ip}"));
+    this.providers.add(new DNSBLProvider("EFnet RBL", "rbl.efnetrbl.org", "You are listed in EFnet RBL - https://rbl.efnetrbl.org/?i={ip}"));
     this.providers.add(new DNSBLProvider("Tornevall", "dnsbl.tornevall.org", "You are listed in Tornevall blacklist"));
   }
 
