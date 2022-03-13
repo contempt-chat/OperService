@@ -27,6 +27,15 @@ public interface KLineService {
   void create(String username, String hostname, boolean isIpAddressOrRange, String reason, User from, String fromAccount, Long duration, String sid, boolean dryRun, boolean isLocal);
 
   /**
+   * Creates a new K-Line
+   * @param from  If SQUERY was used to create the K-Line, the user is stored here, otherwise null
+   * @param kline A K-Line
+   * @param originalDuration Duration in seconds when this K-Line expires, or null
+   * @param dryRun true if this is just a dry run, only simulates K-Line and show who would get banned
+   */
+  void create(User from, KLine kline, Long originalDuration, boolean dryRun);
+
+  /**
    * Finds the first K-Line that matches the given user.
    *
    * @param user An user that is connected to IRC

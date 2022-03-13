@@ -88,8 +88,8 @@ public class UNickEventListener extends AbstractEventListener<UNickEvent> {
          *  3. if the user is not logged in
          */
         if("~-^".contains(String.valueOf(user.getUser().charAt(0)))
-            && (user.getIpAddressFamily() == IpAddressFamily.IPV4 && !Util.isPrivateIPv4Address(user.getIpAddress()))
-            && (user.getIpAddressFamily() == IpAddressFamily.IPV6 && !Util.isPrivateIPv6Address(user.getIpAddress()))
+            && (user.getIpAddressFamily() != IpAddressFamily.IPV4 || !Util.isPrivateIPv4Address(user.getIpAddress()))
+            && (user.getIpAddressFamily() != IpAddressFamily.IPV6 || !Util.isPrivateIPv6Address(user.getIpAddress()))
             && "*".equals(user.getAccount())
             && !user.getIpAddress().equals("255.255.255.255")) {
             dblService.check(user);

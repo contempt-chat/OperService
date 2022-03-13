@@ -65,6 +65,9 @@ public class KLineServiceImpl implements KLineService {
     @Value("${service.channel}")
     private String serviceChannel;
 
+    @Value("${service.name}")
+    private String serviceName;
+
     @Override // FIXME: too many parameters, rewrite this method
     public void create(String username, String hostname, boolean isIpAddressOrRange, String reason, User from, String fromAccount, Long duration, String sid, boolean dryRun, boolean isLocal) {
         KLineDTO klineDTO = new KLineDTO();
@@ -103,27 +106,22 @@ public class KLineServiceImpl implements KLineService {
                             }
 
                             ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
-                            processCreate(from, klineDTO, duration, dryRun);
+                            create(from, map(klineDTO), duration, dryRun);
                         }
                     })
                     .subscribe(
                             response -> {
-                                processCreate(from, response, duration, dryRun);
+                                create(from, map(response), duration, dryRun);
                             }
                     );
         }
         else {
-            processCreate(from, klineDTO, duration, dryRun);
+            create(from, map(klineDTO), duration, dryRun);
         }
     }
 
-    private void processCreate(User from, KLineDTO klineDTO, Long originalDuration, boolean dryRun) {
-        KLine kline = map(klineDTO);
-
-        if (klineDTO.getDuration() != null && klineDTO.getDuration() > 0) {
-            kline.setExpirationDate(new Date(System.currentTimeMillis() + klineDTO.getDuration() * 1000L));
-        }
-
+    @Override
+    public void create(User from, KLine kline, Long originalDuration, boolean dryRun) {
         if (!dryRun) {
             klineList.add(kline);
         }
@@ -135,7 +133,7 @@ public class KLineServiceImpl implements KLineService {
             message.append(" ");
         }
 
-        message.append(String.format("%s added K-LINE for %s:", kline.getCreatedBy(), kline.toHostmask(), kline.getReason()));
+        message.append(String.format("K-LINE added by %s for %s [%s]", kline.getCreatedBy() != null ? kline.getCreatedBy() : serviceName, kline.toHostmask(), kline.getReason()));
 
         if(kline.getSid() != null) {
             message.append(String.format(" on %s", kline.getSid()));
@@ -185,7 +183,7 @@ public class KLineServiceImpl implements KLineService {
     void enforceKLine(KLine kline, String sid, List<IRCUser> userList, User from, boolean dryRun) {
         for (IRCUser user : userList) {
             if(from != null || !dryRun) {
-                String message = String.format("%sEnforcing TKLine on %s for %s (%s@%s) matching %s: %s",
+                String message = String.format("%sEnforcing TKLine on %s for %s (%s@%s) matching %s [%s]",
                     dryRun ? Constants.DRY_RUN_TAG : "",
                     user.getSid(),
                     user.getNick(), user.getUser(), user.getHost(),
@@ -238,7 +236,7 @@ public class KLineServiceImpl implements KLineService {
             kline.setType(KLineType.NOT_SYNCED);
         }
 
-        if (klineDTO.getDuration() != null) {
+        if (klineDTO.getDuration() != null && klineDTO.getDuration() > 0) {
             kline.setExpirationDate(new Date(System.currentTimeMillis() + klineDTO.getDuration() * 1000L));
         }
 

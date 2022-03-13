@@ -29,6 +29,7 @@ public class SQueryCommandKLineList extends SQueryCommand {
     private static final String PARAMETER_FROM = "from";
     private static final String PARAMETER_SID = "sid";
     private static final String PARAMETER_TOR = "tor";
+    private static final String PARAMETER_DNSBL = "dnsbl";
 
     @Autowired
     private KLineService klineService;
@@ -75,6 +76,12 @@ public class SQueryCommandKLineList extends SQueryCommand {
                 .desc("Show only K-Lines for Tor exit nodes")
                 .build();
         options.addOption(tor);
+
+        Option dnsbl = Option.builder(PARAMETER_DNSBL)
+                .argName(PARAMETER_DNSBL)
+                .desc("Show only K-Lines from DNSBL")
+                .build();
+        options.addOption(dnsbl);
     }
 
     /**
@@ -102,6 +109,7 @@ public class SQueryCommandKLineList extends SQueryCommand {
             String createdBy = null;
             String sid = null;
             boolean showOnlyTor = false;
+            boolean showOnlyDNSBL = false;
 
             if (commandLine.hasOption(PARAMETER_FROM)) {
                 createdBy = commandLine.getOptionValue(PARAMETER_FROM);
@@ -115,6 +123,10 @@ public class SQueryCommandKLineList extends SQueryCommand {
                 showOnlyTor = true;
             }
 
+            if (commandLine.hasOption(PARAMETER_DNSBL)) {
+                showOnlyDNSBL = true;
+            }
+
             List<KLine> klineList;
 
             if(showAll) {
@@ -122,6 +134,9 @@ public class SQueryCommandKLineList extends SQueryCommand {
             }
             else if (showOnlyTor) {
                 klineList = klineService.findAllWithTypes(KLineType.TOR);
+            }
+            else if (showOnlyDNSBL) {
+                klineList = klineService.findAllWithTypes(KLineType.DNSBL);
             }
             else {
                 klineList = klineService.findAllWithTypes(KLineType.SYNCED, KLineType.NOT_SYNCED);

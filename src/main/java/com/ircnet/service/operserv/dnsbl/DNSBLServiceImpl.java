@@ -2,7 +2,9 @@ package com.ircnet.service.operserv.dnsbl;
 
 import com.ircnet.service.operserv.IpAddressFamily;
 import com.ircnet.service.operserv.irc.IRCUser;
+import com.ircnet.service.operserv.kline.KLine;
 import com.ircnet.service.operserv.kline.KLineService;
+import com.ircnet.service.operserv.kline.KLineType;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +17,9 @@ import org.xbill.DNS.lookup.NoSuchDomainException;
 
 import java.net.UnknownHostException;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
@@ -202,9 +206,15 @@ public class DNSBLServiceImpl implements DNSBLervice {
   }
 
   private void createKLine(DNSBLRequest request, DNSBLProvider provider) {
-    String klineReason = String.format(provider.getKLineReason().replace("{ip}", request.getIpAddress()));
-    // TODO: KLineType.DNSBL
-    klineService.create(null, request.getIpAddress(), true, klineReason, null, serviceName, TKLINE_DURATION, null, false, true);
+    KLine kline = new KLine();
+    kline.setType(KLineType.DNSBL);
+    kline.setUsername("*");
+    kline.setHostname(request.getIpAddress());
+    kline.setIpAddressOrRange(true);
+    kline.setExpirationDate(new Date(System.currentTimeMillis() + TKLINE_DURATION * 1000L));
+    kline.setReason(String.format(provider.getKLineReason().replace("{ip}", request.getIpAddress())));
+
+    klineService.create(null, kline, TKLINE_DURATION, false);
   }
 
   /**
