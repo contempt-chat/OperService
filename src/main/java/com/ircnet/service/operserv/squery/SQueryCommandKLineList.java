@@ -161,8 +161,11 @@ public class SQueryCommandKLineList extends SQueryCommand {
                 }
                 else {
                     StringBuilder content = new StringBuilder(kline.toHostmask());
-                    content.append(" by ");
-                    content.append(kline.getCreatedBy());
+
+                    if(kline.getCreatedBy() != null) {
+                        content.append(" by ");
+                        content.append(kline.getCreatedBy());
+                    }
 
                     if(kline.getSid() != null) {
                         content.append(String.format(" on %s", kline.getSid()));
@@ -183,6 +186,9 @@ public class SQueryCommandKLineList extends SQueryCommand {
 
             if (showOnlyTor) {
                 notice(from.getNick(), "Found %d K-Lines for Tor exit nodes", count);
+            }
+            else if (showOnlyDNSBL) {
+                notice(from.getNick(), "Found %d K-Lines from DNSBLs", count);
             }
             else {
                 StringBuilder content = new StringBuilder(String.format("Found %d K-Lines", count));
