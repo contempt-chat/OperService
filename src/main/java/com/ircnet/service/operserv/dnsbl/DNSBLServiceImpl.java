@@ -6,6 +6,7 @@ import com.ircnet.service.operserv.kline.KLine;
 import com.ircnet.service.operserv.kline.KLineService;
 import com.ircnet.service.operserv.kline.KLineType;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class DNSBLServiceImpl implements DNSBLervice {
     this.executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
     this.resultMap = new ConcurrentHashMap<>();
     this.providers = new ArrayList<>();
-    this.providers.add(new DNSBLProvider("Spamhaus ZEN", "zen.spamhaus.org", "You are listed in Spamhaus ZEN blocklist"));
+    this.providers.add(new SpamhausProvider("Spamhaus ZEN", "zen.spamhaus.org", "You are listed at Spamhaus ({subLists})"));
     this.providers.add(new DNSBLProvider("all.s5h.net", "all.s5h.net", "You are listed at all.s5h.net"));
     this.providers.add(new DNSBLProvider("DroneBL", "dnsbl.dronebl.org", "You are listed in DroneBL - http://dronebl.org/lookup?ip={ip}"));
     this.providers.add(new DNSBLProvider("EFnet RBL", "rbl.efnetrbl.org", "You are listed in EFnet RBL - https://rbl.efnetrbl.org/?i={ip}"));
@@ -145,38 +146,54 @@ public class DNSBLServiceImpl implements DNSBLervice {
           s.lookupAsync(lookup, Type.A)
               .whenComplete(
                   (answers, ex) -> {
+                    List<String> aRecords = new ArrayList<>();
+
                     if (ex == null && !answers.getRecords().isEmpty()) {
-                      // Found an A record
-                      LOGGER.info("{} is listed in {}", request.getIpAddress(), provider.getName());
-                      // Add K-Line
-                      createKLine(request, provider);
+                      // Collect A records
+                      for (Record record : answers.getRecords()) {
+                        if (!(record instanceof ARecord)) {
+                          continue;
+                        }
+
+                        String ipAddressOfRecord = ((ARecord) record).getAddress().getHostAddress();
+
+                        if (provider.isRelevantARecord(ipAddressOfRecord)) {
+                          aRecords.add(ipAddressOfRecord);
+                        }
+                      }
+
+                      if (!aRecords.isEmpty()) {
+                        LOGGER.info("{} is listed in {} ({})", request.getIpAddress(), provider.getName(), StringUtils.join(aRecords, ", "));
+                        // Add K-Line
+                        createKLine(request, provider, aRecords);
+                        // Add to cache
+                        resultMap.put(request.getIpAddress(), new DNSBLResult(DNSBLStatus.LISTED));
+                        // Stop searching for more matches
+                        isListed.set(true);
+                        iterator.remove();
+                        return;
+                      }
+                    }
+
+                    if (aRecords.isEmpty() || ex.getCause() instanceof NoSuchDomainException || (answers != null && CollectionUtils.isEmpty(answers.getRecords()))) {
+                      // NXDOMAIN or at least no (relevant) A record: not DNSBL listed
+                      LOGGER.debug("{} is not listed in {}", request.getIpAddress(), provider.getName());
                       // Add to cache
-                      resultMap.put(request.getIpAddress(), new DNSBLResult(DNSBLStatus.LISTED));
-                      // Stop searching for more matches
-                      isListed.set(true);
+                      resultMap.put(request.getIpAddress(), new DNSBLResult(DNSBLStatus.NOT_LISTED));
+                      // Continue with next DNSBL provider
                       iterator.remove();
                     }
                     else {
-                      if (ex.getCause() instanceof NoSuchDomainException || (answers != null && CollectionUtils.isEmpty(answers.getRecords()))) {
-                        // NXDOMAIN or at least no A record: not DNSBL listed
-                        LOGGER.debug("{} is not listed in {}", request.getIpAddress(), provider.getName());
-                        // Add to cache
-                        resultMap.put(request.getIpAddress(), new DNSBLResult(DNSBLStatus.NOT_LISTED));
-                        // Continue with next DNSBL provider
+                      // Usually timeout
+                      LOGGER.debug("Could not check if {} is listed in {} (attempt: {}): {}", request.getIpAddress(), provider.getName(), attempt, ex.getMessage());
+
+                      if (entry.getValue() >= MAX_RESOLVE_ATTEMPTS) {
+                        LOGGER.warn("Could not resolve {} after {} attempts - giving up", dnsblHost, attempt);
                         iterator.remove();
                       }
                       else {
-                        // Usually timeout
-                        LOGGER.debug("Could not check if {} is listed in {} (attempt: {}): {}", request.getIpAddress(), provider.getName(), attempt, ex.getMessage());
-
-                        if(entry.getValue() >= MAX_RESOLVE_ATTEMPTS) {
-                          LOGGER.warn("Could not resolve {} after {} attempts - giving up", dnsblHost, attempt);
-                          iterator.remove();
-                        }
-                        else {
-                          // Increment number of attempts
-                          entry.setValue(entry.getValue() + 1);
-                        }
+                        // Increment number of attempts
+                        entry.setValue(entry.getValue() + 1);
                       }
                     }
                   })
@@ -205,14 +222,14 @@ public class DNSBLServiceImpl implements DNSBLervice {
     LOGGER.debug("Finished DNSBL lookup for {} (user: {}!{}@{})", request.getIpAddress(), request.getUser().getNick(), request.getUser().getUser(), request.getUser().getHost());
   }
 
-  private void createKLine(DNSBLRequest request, DNSBLProvider provider) {
+  private void createKLine(DNSBLRequest request, DNSBLProvider provider, List<String> aRecords) {
     KLine kline = new KLine();
     kline.setType(KLineType.DNSBL);
     kline.setUsername("*");
     kline.setHostname(request.getIpAddress());
     kline.setIpAddressOrRange(true);
     kline.setExpirationDate(new Date(System.currentTimeMillis() + TKLINE_DURATION * 1000L));
-    kline.setReason(String.format(provider.getKLineReason().replace("{ip}", request.getIpAddress())));
+    kline.setReason(String.format(provider.getKLineReason(aRecords).replace("{ip}", request.getIpAddress())));
 
     klineService.create(null, kline, TKLINE_DURATION, false);
   }

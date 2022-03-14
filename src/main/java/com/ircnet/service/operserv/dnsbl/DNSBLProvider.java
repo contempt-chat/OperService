@@ -1,5 +1,7 @@
 package com.ircnet.service.operserv.dnsbl;
 
+import java.util.List;
+
 /**
  * Represents a DNSBL provider.
  */
@@ -35,7 +37,17 @@ public class DNSBLProvider {
     return domainName;
   }
 
-  public String getKLineReason() {
+  /**
+   * Creates a K-Line reason.
+   *
+   * @param aRecords The found A records
+   * @return A K-Line reason
+   */
+  public String getKLineReason(List<String> aRecords) {
     return klineReason;
+  }
+
+  public boolean isRelevantARecord(String aRecord) {
+    return true;
   }
 }
