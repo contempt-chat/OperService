@@ -133,7 +133,7 @@ public class KLineServiceImpl implements KLineService {
             message.append(" ");
         }
 
-        message.append(String.format("K-LINE added by %s for %s [%s]", kline.getCreatedBy() != null ? kline.getCreatedBy() : serviceName, kline.toHostmask(), kline.getReason()));
+        message.append(String.format("K-Line added by %s for %s [%s]", kline.getCreatedBy() != null ? kline.getCreatedBy() : serviceName, kline.toHostmask(), kline.getReason()));
 
         if(kline.getSid() != null) {
             message.append(String.format(" on %s", kline.getSid()));
