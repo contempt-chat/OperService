@@ -5,6 +5,7 @@ import com.ircnet.library.common.connection.ConnectionStatus;
 import com.ircnet.library.common.connection.IRCConnectionService;
 import com.ircnet.library.service.IRCServiceTask;
 import com.ircnet.service.operserv.Constants;
+import com.ircnet.service.operserv.ScannerThread;
 import com.ircnet.service.operserv.Util;
 import com.ircnet.service.operserv.irc.IRCUser;
 import com.ircnet.service.operserv.match.MatchService;
@@ -149,7 +150,12 @@ public class KLineServiceImpl implements KLineService {
 
         ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message.toString());
 
-        enforceKLine(kline, from, false, dryRun);
+        ScannerThread.getInstance().runOnThread(new Runnable() {
+            @Override
+            public void run() {
+                enforceKLine(kline, from, false, dryRun);
+            }
+        });
 
         if(!dryRun) {
             persistenceService.scheduleSave();
@@ -359,9 +365,14 @@ public class KLineServiceImpl implements KLineService {
                                     ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), message);
                                 }
 
-                                for (KLine kline : klineList) {
-                                    enforceKLine(kline, null, false, false);
-                                }
+                                ScannerThread.getInstance().runOnThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        for (KLine kline : klineList) {
+                                            enforceKLine(kline, null, false, false);
+                                        }
+                                    }
+                                });
                             }
                         }
                 );

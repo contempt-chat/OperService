@@ -57,7 +57,7 @@ public class ScheduledTasks {
 
         for (KLine kline : expiredKLines) {
             klineList.remove(kline);
-            LOGGER.debug("Removed expired K-Line for %s", kline.toHostmask());
+            LOGGER.debug("Removed expired K-Line for {}", kline.toHostmask());
         }
     }
 }

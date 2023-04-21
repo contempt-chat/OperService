@@ -2,6 +2,7 @@ package com.ircnet.service.operserv.event;
 
 import com.ircnet.library.common.event.AbstractEventListener;
 import com.ircnet.library.service.event.UNickEvent;
+import com.ircnet.service.operserv.ScannerThread;
 import com.ircnet.service.operserv.dnsbl.DNSBLervice;
 import com.ircnet.service.operserv.IpAddressFamily;
 import com.ircnet.service.operserv.Util;
@@ -71,28 +72,33 @@ public class UNickEventListener extends AbstractEventListener<UNickEvent> {
         userService.add(user);
 
         // Check if the user matches a K-Line. Should we wait for end of burst?
-        KLine kline = klineService.findMatchingKLine(user);
+        ScannerThread.getInstance().runOnThread(new Runnable() {
+            @Override
+            public void run() {
+                KLine kline = klineService.findMatchingKLine(user);
 
-        if(kline != null) {
-            String message = String.format("Enforcing TKLine on %s for %s (%s@%s) matching %s: %s",
-                user.getSid(), user.getNick(), user.getUser(), user.getHost(), kline.toHostmask(), kline.getReason());
-            LOGGER.info(message);
-            ircConnectionService.notice(event.getIRCConnection(), serviceChannel, message);
-            klineService.enforceKLine(kline, user.getSid());
-        }
+                if(kline != null) {
+                    String message = String.format("Enforcing TKLine on %s for %s (%s@%s) matching %s: %s",
+                            user.getSid(), user.getNick(), user.getUser(), user.getHost(), kline.toHostmask(), kline.getReason());
+                    LOGGER.info(message);
+                    ircConnectionService.notice(event.getIRCConnection(), serviceChannel, message);
+                    klineService.enforceKLine(kline, user.getSid());
+                }
 
-        /*
-         * Check if the IP address is listed in DNBLs, if:
-         *  1. it is an IPv4 (what about IPv6 support?)
-         *  2. the IPv4 is not a private or cloaked
-         *  3. if the user is not logged in
-         */
-        if("~-^".contains(String.valueOf(user.getUser().charAt(0)))
-            && (user.getIpAddressFamily() != IpAddressFamily.IPV4 || !Util.isPrivateIPv4Address(user.getIpAddress()))
-            && (user.getIpAddressFamily() != IpAddressFamily.IPV6 || !Util.isPrivateIPv6Address(user.getIpAddress()))
-            && "*".equals(user.getAccount())
-            && !user.getIpAddress().equals("255.255.255.255")) {
-            dblService.check(user);
-        }
+                /*
+                 * Check if the IP address is listed in DNBLs, if:
+                 *  1. it is an IPv4 (what about IPv6 support?)
+                 *  2. the IPv4 is not a private or cloaked
+                 *  3. if the user is not logged in
+                 */
+                if("~-^".contains(String.valueOf(user.getUser().charAt(0)))
+                        && (user.getIpAddressFamily() != IpAddressFamily.IPV4 || !Util.isPrivateIPv4Address(user.getIpAddress()))
+                        && (user.getIpAddressFamily() != IpAddressFamily.IPV6 || !Util.isPrivateIPv6Address(user.getIpAddress()))
+                        && "*".equals(user.getAccount())
+                        && !user.getIpAddress().equals("255.255.255.255")) {
+                    dblService.check(user);
+                }
+            }
+        });
     }
 }

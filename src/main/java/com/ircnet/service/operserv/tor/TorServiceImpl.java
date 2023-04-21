@@ -3,6 +3,7 @@ package com.ircnet.service.operserv.tor;
 import com.ircnet.library.common.connection.ConnectionStatus;
 import com.ircnet.library.common.connection.IRCConnectionService;
 import com.ircnet.library.service.IRCServiceTask;
+import com.ircnet.service.operserv.ScannerThread;
 import com.ircnet.service.operserv.kline.KLine;
 import com.ircnet.service.operserv.kline.KLineService;
 import com.ircnet.service.operserv.kline.KLineType;
@@ -78,9 +79,14 @@ public class TorServiceImpl implements TorService {
                 if (ircServiceTask.getIRCConnection().getConnectionStatus() == ConnectionStatus.REGISTERED) {
                     ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
 
-                    for (KLine kline : newKLines) {
-                        klineService.enforceKLine(kline, null, false, false);
-                    }
+                    ScannerThread.getInstance().runOnThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (KLine kline : newKLines) {
+                                klineService.enforceKLine(kline, null, false, false);
+                            }
+                        }
+                    });
                 }
             }
         });

@@ -88,5 +88,8 @@ public class Application implements CommandLineRunner {
 
         // Start IRC service
         ircServiceThread.start();
+
+        // Start scanner thread
+        ScannerThread.getInstance().start();
     }
 }
