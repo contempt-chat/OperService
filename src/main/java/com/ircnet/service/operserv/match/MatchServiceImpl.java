@@ -65,7 +65,11 @@ public class MatchServiceImpl implements MatchService {
                         continue;
                     }
                 }
-                else if (!accountName.equalsIgnoreCase(user.getAccount())) {
+                else if(user.getAccount() == null) {
+                    // Searching for logged-in users, but user is not logged in
+                    continue;
+                }
+                else if (!accountName.equals("*") && !Util.matches(user.getAccount(), accountName)) {
                     // Account name does not match
                     continue;
                 }
