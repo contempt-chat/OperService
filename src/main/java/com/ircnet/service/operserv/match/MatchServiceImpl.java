@@ -2,6 +2,8 @@ package com.ircnet.service.operserv.match;
 
 import com.ircnet.service.operserv.Util;
 import com.ircnet.service.operserv.irc.IRCUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.web.util.matcher.IpAddressMatcher;
@@ -13,6 +15,8 @@ import java.util.Map;
 // Checked (FIXME)
 @Service
 public class MatchServiceImpl implements MatchService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MatchServiceImpl.class);
+
     @Autowired
     @Qualifier("userMapByUID")
     private Map<String, IRCUser> userMapByUID;
@@ -61,6 +65,7 @@ public class MatchServiceImpl implements MatchService {
             if(accountName != null) {
                 if(accountName.equals("0") && user.getAccount() != null) {
                     // Searching for not logged-in users, but user is logged in
+                    LOGGER.warn("Account name is '{}'", user.getAccount());
                     continue;
                 }
                 if (!accountName.equalsIgnoreCase(user.getAccount())) {
