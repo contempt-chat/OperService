@@ -63,7 +63,7 @@ public class MatchServiceImpl implements MatchService {
                     // Searching for not logged-in users, but user is logged in
                     continue;
                 }
-                if (!user.getAccount().equalsIgnoreCase(accountName)) {
+                if (!accountName.equalsIgnoreCase(user.getAccount())) {
                     // Account name does not match
                     continue;
                 }
