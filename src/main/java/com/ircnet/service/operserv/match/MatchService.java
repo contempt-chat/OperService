@@ -27,7 +27,8 @@ public interface MatchService {
      * @param hostname hostname pattern (wildcards or CIDR notation)
      * @param isIpAddressOrRange true if the hostname is an IP address or range
      * @param sid SID pattern
+     * @param account Account name or null to match anything
      * @return A list of users that are connected to IRC
      */
-    List<IRCUser> findMatching(String username, String hostname, boolean isIpAddressOrRange, String sid);
+    List<IRCUser> findMatching(String username, String hostname, boolean isIpAddressOrRange, String sid, String account);
 }

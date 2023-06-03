@@ -66,7 +66,11 @@ public class UNickEventListener extends AbstractEventListener<UNickEvent> {
         }
 
         user.setUserModes(event.getUserModes());
-        user.setAccount(event.getAccount());
+
+        if(!event.getAccount().equals("*")) {
+            user.setAccount(event.getAccount());
+        }
+
         user.setRealName(event.getRealName());
 
         userService.add(user);
@@ -94,7 +98,7 @@ public class UNickEventListener extends AbstractEventListener<UNickEvent> {
                 if("~-^".contains(String.valueOf(user.getUser().charAt(0)))
                         && (user.getIpAddressFamily() != IpAddressFamily.IPV4 || !Util.isPrivateIPv4Address(user.getIpAddress()))
                         && (user.getIpAddressFamily() != IpAddressFamily.IPV6 || !Util.isPrivateIPv6Address(user.getIpAddress()))
-                        && "*".equals(user.getAccount())
+                        && user.getAccount() == null
                         && !user.getIpAddress().equals("255.255.255.255")) {
                     dblService.check(user);
                 }

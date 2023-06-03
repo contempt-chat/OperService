@@ -266,7 +266,7 @@ public class KLineServiceImpl implements KLineService {
     }
 
     private boolean matchKLine(KLine kline, IRCUser user) {
-        if (kline.getType() == KLineType.TOR && !user.getAccount().isEmpty() && !user.getAccount().equals("*")) {
+        if (kline.getType() == KLineType.TOR && user.getAccount() != null) {
             // Do not apply K-Line for Tor exit nodes if the user is authenticated
             return false;
         }

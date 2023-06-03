@@ -24,6 +24,7 @@ public class SQueryCommandWho extends SQueryCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(SQueryCommandWho.class);
 
     private static final String PARAMETER_SID = "sid";
+    private static final String PARAMETER_ACCOUNT = "account";
 
     @Autowired
     private MatchService matchService;
@@ -49,8 +50,14 @@ public class SQueryCommandWho extends SQueryCommand {
                 .argName(PARAMETER_SID)
                 .desc("SID pattern")
                 .build();
-
         options.addOption(sid);
+
+        Option account = Option.builder(PARAMETER_ACCOUNT)
+            .hasArg()
+            .argName(PARAMETER_ACCOUNT)
+            .desc("account name")
+            .build();
+        options.addOption(account);
     }
 
     /**
@@ -80,9 +87,13 @@ public class SQueryCommandWho extends SQueryCommand {
             }
 
             String sid = null;
+            String account = null;
 
             if (commandLine.hasOption(PARAMETER_SID)) {
                 sid = commandLine.getOptionValue(PARAMETER_SID);
+            }
+            if (commandLine.hasOption(PARAMETER_ACCOUNT)) {
+                account = commandLine.getOptionValue(PARAMETER_ACCOUNT);
             }
 
             String hostmask = commandLine.getArgList().get(0);
@@ -100,14 +111,14 @@ public class SQueryCommandWho extends SQueryCommand {
             }
 
             boolean isIpAddressOrRange = Util.isIpAddressOrRange(identAndHost[1]);
-            List<IRCUser> matchingUsers = matchService.findMatching(identAndHost[0], identAndHost[1], isIpAddressOrRange, sid);
+            List<IRCUser> matchingUsers = matchService.findMatching(identAndHost[0], identAndHost[1], isIpAddressOrRange, sid, account);
 
             if (!matchingUsers.isEmpty()) {
                 notice(from.getNick(), "Users matching hostmask %s%s", hostmask, sid != null ? (" on " + sid) : "");
 
                 for (IRCUser user : matchingUsers) {
                     notice(from.getNick(), "  %s (%s@%s / %s) on %s %s", user.getNick(), user.getUser(), user.getHost(), user.getIpAddress(), user.getSid(),
-                            (!user.getAccount().equals("*") ? "logged in as " + user.getAccount() : ""));
+                            (user.getAccount() != null ? "logged in as " + user.getAccount() : ""));
                 }
             }
             else {

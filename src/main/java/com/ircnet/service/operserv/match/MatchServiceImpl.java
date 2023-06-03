@@ -54,10 +54,21 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public List<IRCUser> findMatching(String username, String hostname, boolean isIpAddressOrRange, String sid) {
+    public List<IRCUser> findMatching(String username, String hostname, boolean isIpAddressOrRange, String sid, String accountName) {
         List<IRCUser> matchingUsers = new ArrayList<>();
 
         for (IRCUser user : userMapByUID.values()) {
+            if(accountName != null) {
+                if(accountName.equals("0") && user.getAccount() != null) {
+                    // Searching for not logged-in users, but user is logged in
+                    continue;
+                }
+                if (!user.getAccount().equalsIgnoreCase(accountName)) {
+                    // Account name does not match
+                    continue;
+                }
+            }
+
             if(isMatching(user, username, hostname, isIpAddressOrRange, sid)) {
                 matchingUsers.add(user);
             }
