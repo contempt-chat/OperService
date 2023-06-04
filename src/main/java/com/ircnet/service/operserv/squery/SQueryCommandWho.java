@@ -111,20 +111,26 @@ public class SQueryCommandWho extends SQueryCommand {
             }
 
             boolean isIpAddressOrRange = Util.isIpAddressOrRange(identAndHost[1]);
+
+            StringBuilder stringBuilder = new StringBuilder("Searching for users matching hostmask ");
+            stringBuilder.append(hostmask);
+
+            if(sid != null) {
+                stringBuilder.append(" on ");
+                stringBuilder.append(sid);
+            }
+
+            if(account != null) {
+                stringBuilder.append(" logged in as \"");
+                stringBuilder.append(account);
+                stringBuilder.append("\"");
+            }
+
+            notice(from.getNick(), stringBuilder.toString());
+
             List<IRCUser> matchingUsers = matchService.findMatching(identAndHost[0], identAndHost[1], isIpAddressOrRange, sid, account);
-            StringBuilder stringBuilder;
 
             if (!matchingUsers.isEmpty()) {
-                stringBuilder = new StringBuilder("Users matching hostmask ");
-                stringBuilder.append(hostmask);
-
-                if(sid != null) {
-                    stringBuilder.append(" on ");
-                    stringBuilder.append(sid);
-                }
-
-                notice(from.getNick(), stringBuilder.toString());
-
                 for (IRCUser user : matchingUsers) {
                     stringBuilder = new StringBuilder(user.getNick());
                     stringBuilder.append(String.format(" (%s@%s", user.getUser(), user.getHost()));
@@ -149,15 +155,8 @@ public class SQueryCommandWho extends SQueryCommand {
                 notice(from.getNick(), "Found %d users", matchingUsers.size());
             }
             else {
-                stringBuilder = new StringBuilder("No users could be found that match hostmask ");
-                stringBuilder.append(hostmask);
+                notice(from.getNick(), "No users could be found");
 
-                if(sid != null) {
-                    stringBuilder.append(" on ");
-                    stringBuilder.append(sid);
-                }
-
-                notice(from.getNick(), stringBuilder.toString());
             }
         }
         catch (ParseException e) {
