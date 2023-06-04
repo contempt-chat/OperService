@@ -112,17 +112,52 @@ public class SQueryCommandWho extends SQueryCommand {
 
             boolean isIpAddressOrRange = Util.isIpAddressOrRange(identAndHost[1]);
             List<IRCUser> matchingUsers = matchService.findMatching(identAndHost[0], identAndHost[1], isIpAddressOrRange, sid, account);
+            StringBuilder stringBuilder;
 
             if (!matchingUsers.isEmpty()) {
-                notice(from.getNick(), "Users matching hostmask %s%s", hostmask, sid != null ? (" on " + sid) : "");
+                stringBuilder = new StringBuilder("Users matching hostmask ");
+                stringBuilder.append(hostmask);
+
+                if(sid != null) {
+                    stringBuilder.append(" on ");
+                    stringBuilder.append(sid);
+                }
+
+                notice(from.getNick(), stringBuilder.toString());
 
                 for (IRCUser user : matchingUsers) {
-                    notice(from.getNick(), "  %s (%s@%s / %s) on %s %s", user.getNick(), user.getUser(), user.getHost(), user.getIpAddress(), user.getSid(),
-                            (user.getAccount() != null ? "logged in as " + user.getAccount() : ""));
+                    stringBuilder = new StringBuilder(user.getNick());
+                    stringBuilder.append(String.format(" (%s@%s", user.getUser(), user.getHost()));
+
+                    if(!user.getHost().equals(user.getIpAddress())) {
+                        stringBuilder.append(" / ");
+                        stringBuilder.append(user.getIpAddress());
+                    }
+
+                    stringBuilder.append(")");
+                    stringBuilder.append(" on ");
+                    stringBuilder.append(user.getSid());
+
+                    if(user.getAccount() != null) {
+                        stringBuilder.append(" logged in as ");
+                        stringBuilder.append(user.getAccount());
+                    }
+
+                    notice(from.getNick(), stringBuilder.toString());
                 }
+
+                notice(from.getNick(), "Found %d users", matchingUsers.size());
             }
             else {
-                notice(from.getNick(), "No users could be found that match hostmask %s%s", hostmask, sid != null ? (" on " + sid) : "");
+                stringBuilder = new StringBuilder("No users could be found that match hostmask ");
+                stringBuilder.append(hostmask);
+
+                if(sid != null) {
+                    stringBuilder.append(" on ");
+                    stringBuilder.append(sid);
+                }
+
+                notice(from.getNick(), stringBuilder.toString());
             }
         }
         catch (ParseException e) {
@@ -150,6 +185,12 @@ public class SQueryCommandWho extends SQueryCommand {
 
             notice(nick, "/SQUERY %s %s -sid 00A *@*.example.com", serviceName, commandName);
             notice(nick, "  Finds users with any ident that have a hostname matching *.example.com on servers whose SID is starting with 00A");
+
+            notice(nick, "/SQUERY %s %s -account someone *@*", serviceName, commandName);
+            notice(nick, "  Finds users logged in as \"someone\"");
+
+            notice(nick, "/SQUERY %s %s -account 0 *@*", serviceName, commandName);
+            notice(nick, "  Finds users that are not logged in");
         } else {
             sendSyntax(nick);
         }
