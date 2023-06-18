@@ -1,12 +1,8 @@
-package com.ircnet.service.operserv.irc;
+package com.ircnet.service.operserv.web.dto;
 
 import com.ircnet.service.operserv.IpAddressFamily;
 
-/**
- * Represents an user that is connected to IRC.
- * Instances will be created by parsing UNICK.
- */
-public class IRCUser {
+public class WhoUserDTO {
   /**
    * SID of the server the user is connected to.
    */
@@ -25,7 +21,7 @@ public class IRCUser {
   /**
    * Username / ident.
    */
-  private String user;
+  private String username;
 
   /**
    * Hostname.
@@ -36,11 +32,6 @@ public class IRCUser {
    * IP address.
    */
   private String ipAddress;
-
-  /**
-   * IP address family (IPv4 or IPv6).
-   */
-  private IpAddressFamily ipAddressFamily;
 
   /**
    * User modes.
@@ -56,9 +47,6 @@ public class IRCUser {
    * Real name.
    */
   private String realName;
-
-  public IRCUser() {
-  }
 
   public String getSid() {
     return sid;
@@ -84,12 +72,12 @@ public class IRCUser {
     this.nick = nick;
   }
 
-  public String getUser() {
-    return user;
+  public String getUsername() {
+    return username;
   }
 
-  public void setUser(String user) {
-    this.user = user;
+  public void setUsername(String username) {
+    this.username = username;
   }
 
   public String getHost() {
@@ -106,14 +94,6 @@ public class IRCUser {
 
   public void setIpAddress(String ipAddress) {
     this.ipAddress = ipAddress;
-  }
-
-  public IpAddressFamily getIpAddressFamily() {
-    return ipAddressFamily;
-  }
-
-  public void setIpAddressFamily(IpAddressFamily ipAddressFamily) {
-    this.ipAddressFamily = ipAddressFamily;
   }
 
   public String getUserModes() {

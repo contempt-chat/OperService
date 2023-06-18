@@ -44,6 +44,14 @@ public interface KLineService {
   KLine findMatchingKLine(IRCUser user);
 
   /**
+   * Finds a K-Line by ID.
+   *
+   * @param id An ID
+   * @return A K-Line or null
+   */
+  KLine find(long id);
+
+  /**
    * Returns all K-Lines stored by this service that have not expired.
    *
    * @return A list of K-Lines
@@ -59,19 +67,19 @@ public interface KLineService {
   List<KLine> findAllWithTypes(KLineType... types);
 
   /**
+   * Returns all expired K-Lines.
+   *
+   * @return A list of expired K-Lines
+   */
+  List<KLine> findExpired();
+
+  /**
    * Checks if at least one not expired K-Line of the given type exists.
    *
    * @param type A type
    * @return true if a K-Line from the given type exists
    */
   boolean hasAnyWithType(KLineType type);
-
-  /**
-   * Returns all expired K-Lines.
-   *
-   * @return A list of expired K-Lines
-   */
-  List<KLine> findExpired();
 
   /**
    * Sends a K-Line to an IRC server.
@@ -107,6 +115,14 @@ public interface KLineService {
    *            This parameter cannot be used to convert a global K-Line into a local K-Line.
    */
   void remove(User from, String hostmask, String sid);
+
+  /**
+   * Removes a K-Line.
+   *
+   * @param from If this method was executed by SQUERY, the user is stored here
+   * @param kline The K-Line to remove
+   */
+  void removeKLine(KLine kline, User from);
 
   /**
    * Removes all K-Lines of a given type.

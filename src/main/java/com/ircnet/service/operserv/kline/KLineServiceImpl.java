@@ -107,17 +107,17 @@ public class KLineServiceImpl implements KLineService {
                             }
 
                             ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
-                            create(from, map(klineDTO), duration, dryRun);
+                            create(from, KLineMapper.map(klineDTO), duration, dryRun);
                         }
                     })
                     .subscribe(
                             response -> {
-                                create(from, map(response), duration, dryRun);
+                                create(from, KLineMapper.map(response), duration, dryRun);
                             }
                     );
         }
         else {
-            create(from, map(klineDTO), duration, dryRun);
+            create(from, KLineMapper.map(klineDTO), duration, dryRun);
         }
     }
 
@@ -225,30 +225,6 @@ public class KLineServiceImpl implements KLineService {
 
     }
 
-    private KLine map(KLineDTO klineDTO) {
-        KLine kline = new KLine();
-        kline.setId(klineDTO.getId());
-        kline.setUsername(StringUtils.isNotBlank(klineDTO.getUsername()) ? klineDTO.getUsername() : "*");
-        kline.setHostname(klineDTO.getHostname());
-        kline.setIpAddressOrRange(Util.isIpAddressOrRange(klineDTO.getHostname()));
-        kline.setReason(klineDTO.getReason());
-        kline.setSid(klineDTO.getSid());
-        kline.setCreatedBy(klineDTO.getRequestedBy());
-
-        if(klineDTO.getId() != null) {
-            kline.setType(KLineType.SYNCED);
-        }
-        else {
-            kline.setType(KLineType.NOT_SYNCED);
-        }
-
-        if (klineDTO.getDuration() != null && klineDTO.getDuration() > 0) {
-            kline.setExpirationDate(new Date(System.currentTimeMillis() + klineDTO.getDuration() * 1000L));
-        }
-
-        return kline;
-    }
-
     @Override
     public KLine findMatchingKLine(IRCUser user) {
         Date now = new Date();
@@ -263,6 +239,11 @@ public class KLineServiceImpl implements KLineService {
         }
 
         return null;
+    }
+
+     @Override
+     public KLine find(long id) {
+        return klineList.stream().filter(e -> e.getId() != null && e.getId() == id).findFirst().orElse(null);
     }
 
     private boolean matchKLine(KLine kline, IRCUser user) {
@@ -350,7 +331,7 @@ public class KLineServiceImpl implements KLineService {
                             klineList.removeAll(webServiceKLineList);
                             webServiceKLineList.clear();
 
-                            response.stream().map(e -> map(e)).forEach(e -> webServiceKLineList.add(e));
+                            response.stream().map(e -> KLineMapper.map(e)).forEach(e -> webServiceKLineList.add(e));
 
                             LOGGER.info("Loaded {} K-Lines from webservice", webServiceKLineList.size());
                             klineList.addAll(webServiceKLineList);
@@ -413,18 +394,23 @@ public class KLineServiceImpl implements KLineService {
                     .subscribe(
                             response -> {
                                 ircConnectionService.send(ircServiceTask.getIRCConnection(), "ENCAP %s UNTKLINE %s", "*", hostmask);
-                                klineList.remove(kline);
-                                String message = String.format("Removed K-Line for %s", hostmask);
-
-                                if(from != null) {
-                                    ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), message);
-                                }
-
-                                ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
-                                persistenceService.scheduleSave();
+                                removeKLine(kline, from);
                             }
                     );
         }
+    }
+
+    @Override
+    public void removeKLine(KLine kline, User from) {
+        klineList.remove(kline);
+        String message = String.format("Removed K-Line for %s", kline.toHostmask());
+
+        if(from != null) {
+            ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), message);
+        }
+
+        ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
+        persistenceService.scheduleSave();
     }
 
     @Override

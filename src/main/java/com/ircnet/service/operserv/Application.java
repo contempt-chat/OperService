@@ -16,6 +16,7 @@ import org.springframework.boot.Banner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 import java.util.List;
 // Checked (FIXME)
@@ -23,7 +24,7 @@ import java.util.List;
  * Main class.
  */
 @SpringBootApplication
-public class Application implements CommandLineRunner {
+public class Application extends SpringBootServletInitializer implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
     @Autowired
