@@ -113,21 +113,6 @@ public class ServiceConfiguration {
     }
 
     @Bean
-    public SQueryCommandKLine squeryCommandKLine() {
-        return new SQueryCommandKLine("KLINE");
-    }
-
-    @Bean
-    public SQueryCommandUnkline squeryCommandUnkline() {
-        return new SQueryCommandUnkline("UNKLINE");
-    }
-
-    @Bean
-    public SQueryCommandKLineList squeryCommandKLineList() {
-        return new SQueryCommandKLineList("KLINES");
-    }
-
-    @Bean
     public SQueryCommandReload squeryCommandReload() {
         return new SQueryCommandReload("RELOAD");
     }
@@ -147,16 +132,10 @@ public class ServiceConfiguration {
                                                        SQueryCommandVersion squeryCommandVersion,
                                                        SQueryCommandInfo squeryCommandInfo,
                                                        SQueryCommandHelp squeryCommandHelp,
-                                                       SQueryCommandKLine squeryCommandKLine,
-                                                       SQueryCommandUnkline squeryCommandUnkline,
-                                                       SQueryCommandKLineList squeryCommandKLineList,
                                                        SQueryCommandReload squeryCommandReload,
                                                        SQueryCommandStatus sQueryCommandStatus,
                                                        SQueryCommandWho squeryCommandWho) {
         Map<String, SQueryCommand> commandMap = new LinkedCaseInsensitiveMap<>();
-        addCommand(commandMap, squeryCommandKLine);
-        addCommand(commandMap, squeryCommandUnkline);
-        addCommand(commandMap, squeryCommandKLineList);
         addCommand(commandMap, squeryCommandReload);
         addCommand(commandMap, sQueryCommandStatus);
         addCommand(commandMap, squeryCommandWho);
