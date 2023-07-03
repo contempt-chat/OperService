@@ -2,6 +2,7 @@ package com.ircnet.service.operserv.match;
 
 import com.ircnet.service.operserv.Util;
 import com.ircnet.service.operserv.irc.IRCUser;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.web.util.matcher.IpAddressMatcher;
@@ -20,7 +21,7 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public boolean isMatching(IRCUser user, String username, String hostname, boolean isIpAddressOrRange, String sid) {
         // Check SID
-        if(sid != null && !Util.matches(user.getSid(), sid)) {
+        if(StringUtils.isNotEmpty(sid) && !Util.matches(user.getSid(), sid)) {
             return false;
         }
 

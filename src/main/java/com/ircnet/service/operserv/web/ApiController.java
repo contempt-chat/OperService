@@ -64,7 +64,7 @@ public class ApiController {
   public ResponseEntity<Object> who(@RequestBody WhoDTO whoDTO) {
     boolean isIpAddressOrRange = Util.isIpAddressOrRange(whoDTO.getHostname());
     List<IRCUser> matchingUsers = matchService.findMatching(whoDTO.getUsername(), whoDTO.getHostname(),
-        isIpAddressOrRange, whoDTO.getSid(), null);
+        isIpAddressOrRange, whoDTO.getSid(), whoDTO.getAccount());
     List<WhoUserDTO> whoUserDTOs = matchingUsers.stream().map(e -> mapIRCUser(e)).collect(Collectors.toList());
     WhoReplyDTO whoReplyDTO = new WhoReplyDTO();
     whoReplyDTO.setUsers(whoUserDTOs);
