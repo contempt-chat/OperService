@@ -122,23 +122,16 @@ public class ServiceConfiguration {
         return new SQueryCommandStatus("STATUS");
     }
 
-    @Bean
-    public SQueryCommandWho squeryCommandWho() {
-        return new SQueryCommandWho("WHO");
-    }
-
     @Bean("squeryCommandMap")
     public Map<String, SQueryCommand> squeryCommandMap(SQueryCommandAdmin squeryCommandAdmin,
                                                        SQueryCommandVersion squeryCommandVersion,
                                                        SQueryCommandInfo squeryCommandInfo,
                                                        SQueryCommandHelp squeryCommandHelp,
                                                        SQueryCommandReload squeryCommandReload,
-                                                       SQueryCommandStatus sQueryCommandStatus,
-                                                       SQueryCommandWho squeryCommandWho) {
+                                                       SQueryCommandStatus sQueryCommandStatus) {
         Map<String, SQueryCommand> commandMap = new LinkedCaseInsensitiveMap<>();
         addCommand(commandMap, squeryCommandReload);
         addCommand(commandMap, sQueryCommandStatus);
-        addCommand(commandMap, squeryCommandWho);
         addCommand(commandMap, squeryCommandAdmin);
         addCommand(commandMap, squeryCommandInfo);
         addCommand(commandMap, squeryCommandVersion);
