@@ -161,4 +161,14 @@ public class KLine {
   public String toHostmask() {
     return String.format("%s@%s", getUsername(), getHostname());
   }
+
+  @Override
+  public int hashCode() {
+    if(id != null) {
+      return id.intValue();
+    }
+    else {
+      return super.hashCode();
+    }
+  }
 }

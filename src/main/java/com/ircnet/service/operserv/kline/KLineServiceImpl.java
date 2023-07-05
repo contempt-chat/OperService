@@ -4,24 +4,19 @@ import com.ircnet.library.common.User;
 import com.ircnet.library.common.connection.ConnectionStatus;
 import com.ircnet.library.common.connection.IRCConnectionService;
 import com.ircnet.library.service.IRCServiceTask;
-import com.ircnet.service.operserv.Constants;
 import com.ircnet.service.operserv.ScannerThread;
 import com.ircnet.service.operserv.Util;
 import com.ircnet.service.operserv.irc.IRCUser;
 import com.ircnet.service.operserv.match.MatchService;
 import com.ircnet.service.operserv.persistence.PersistenceService;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,10 +28,6 @@ public class KLineServiceImpl implements KLineService {
     @Autowired
     @Qualifier("klineList")
     private List<KLine> klineList;
-
-    @Autowired
-    @Qualifier("webServiceKLineList")
-    private List<KLine> webServiceKLineList;
 
     @Autowired
     @Qualifier("userMapByUID")
@@ -69,71 +60,11 @@ public class KLineServiceImpl implements KLineService {
     @Value("${service.name}")
     private String serviceName;
 
-    @Override // FIXME: too many parameters, rewrite this method
-    public void create(String username, String hostname, boolean isIpAddressOrRange, String reason, User from, String fromAccount, Long duration, String sid, boolean dryRun, boolean isLocal) {
-        KLineDTO klineDTO = new KLineDTO();
-        klineDTO.setUsername(username);
-        klineDTO.setHostname(hostname);
-        klineDTO.setReason(reason);
-        klineDTO.setRequestedBy(fromAccount);
-
-        if (duration != null && duration > 0) {
-            klineDTO.setDuration(duration);
-        }
-
-        if(sid != null) {
-            klineDTO.setSid(sid);
-        }
-
-        if (!dryRun && !isLocal) {
-            WebClient.create(apiURL)
-                    .post()
-                    .headers(headers -> headers.setBasicAuth(apiUsername, apiPassword))
-                    .body(Mono.just(klineDTO), KLineDTO.class)
-                    .retrieve()
-                    .bodyToMono(KLineDTO.class)
-                    .doOnError(e -> {
-                        if ((e instanceof WebClientResponseException) && ((WebClientResponseException) e).getStatusCode() == HttpStatus.CONFLICT) {
-                            // K-Line exists already on webservice
-                            if(from != null) {
-                                ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), "Entry exists already.");
-                            }
-                        }
-                        else {
-                            String message = String.format("Could not add K-Line: API request failed: %s", e.getMessage());
-
-                            if(from != null) {
-                                ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), message);
-                            }
-
-                            ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
-                            create(from, KLineMapper.map(klineDTO), duration, dryRun);
-                        }
-                    })
-                    .subscribe(
-                            response -> {
-                                create(from, KLineMapper.map(response), duration, dryRun);
-                            }
-                    );
-        }
-        else {
-            create(from, KLineMapper.map(klineDTO), duration, dryRun);
-        }
-    }
-
     @Override
-    public void create(User from, KLine kline, Long originalDuration, boolean dryRun) {
-        if (!dryRun) {
-            klineList.add(kline);
-        }
+    public void create(User from, KLine kline, Long originalDuration) {
+        klineList.add(kline);
 
         StringBuilder message = new StringBuilder();
-
-        if(dryRun) {
-            message.append(Constants.DRY_RUN_TAG);
-            message.append(" ");
-        }
-
         message.append(String.format("K-Line added by %s for %s [%s]", kline.getCreatedBy() != null ? kline.getCreatedBy() : serviceName, kline.toHostmask(), kline.getReason()));
 
         if(kline.getSid() != null) {
@@ -153,17 +84,15 @@ public class KLineServiceImpl implements KLineService {
         ScannerThread.getInstance().runOnThread(new Runnable() {
             @Override
             public void run() {
-                enforceKLine(kline, from, false, dryRun);
+                enforceKLine(kline, from, false);
             }
         });
 
-        if(!dryRun) {
-            persistenceService.scheduleSave();
-        }
+        persistenceService.scheduleSave();
     }
 
     @Override
-    public void enforceKLine(KLine kline, User from, boolean skipAuthenticatedUsers, boolean dryRun) {
+    public void enforceKLine(KLine kline, User from, boolean skipAuthenticatedUsers) {
         List<IRCUser> matchingUsers = isMatchingAnyUser(kline);
 
         if (!matchingUsers.isEmpty()) {
@@ -181,16 +110,15 @@ public class KLineServiceImpl implements KLineService {
             }
 
             for (Map.Entry<String, List<IRCUser>> entry : sidUserMap.entrySet()) {
-                enforceKLine(kline, entry.getKey(), entry.getValue(), from, dryRun);
+                enforceKLine(kline, entry.getKey(), entry.getValue(), from);
             }
         }
     }
 
-    void enforceKLine(KLine kline, String sid, List<IRCUser> userList, User from, boolean dryRun) {
+    void enforceKLine(KLine kline, String sid, List<IRCUser> userList, User from) {
         for (IRCUser user : userList) {
-            if(from != null || !dryRun) {
-                String message = String.format("%sEnforcing TKLine on %s for %s (%s@%s) matching %s [%s]",
-                    dryRun ? Constants.DRY_RUN_TAG : "",
+            if(from != null) {
+                String message = String.format("Enforcing TKLine on %s for %s (%s@%s) matching %s [%s]",
                     user.getSid(),
                     user.getNick(), user.getUser(), user.getHost(),
                     kline.toHostmask(),
@@ -200,10 +128,9 @@ public class KLineServiceImpl implements KLineService {
                     ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), message);
                 }
 
-                if (!dryRun) {
-                    LOGGER.info(message);
-                    ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
-                }
+                LOGGER.info(message);
+                ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
+
             }
         }
 
@@ -264,7 +191,7 @@ public class KLineServiceImpl implements KLineService {
         return Collections.unmodifiableList(filteredKLineList);
     }
 
-    @Override
+/*    @Override
     public List<KLine> findAllWithTypes(KLineType... types) {
         Date now = new Date();
         List<KLineType> typeList = Arrays.asList(types);
@@ -273,7 +200,7 @@ public class KLineServiceImpl implements KLineService {
             .filter(e -> e.getExpirationDate() == null || e.getExpirationDate().after(now))
             .collect(Collectors.toList());
         return Collections.unmodifiableList(filteredKLineList);
-    }
+    }*/
 
     @Override
     public boolean hasAnyWithType(KLineType type) {
@@ -328,9 +255,9 @@ public class KLineServiceImpl implements KLineService {
                 .subscribe(
                         response -> {
                             // Remove K-Lines that came from webservice originally
-                            klineList.removeAll(webServiceKLineList);
-                            webServiceKLineList.clear();
+                            klineList.removeIf(e -> e.getType() == KLineType.WEB);
 
+                            List<KLine> webServiceKLineList = new ArrayList<>();
                             response.stream().map(e -> KLineMapper.map(e)).forEach(e -> webServiceKLineList.add(e));
 
                             LOGGER.info("Loaded {} K-Lines from webservice", webServiceKLineList.size());
@@ -350,7 +277,7 @@ public class KLineServiceImpl implements KLineService {
                                     @Override
                                     public void run() {
                                         for (KLine kline : klineList) {
-                                            enforceKLine(kline, null, false, false);
+                                            enforceKLine(kline, null, false);
                                         }
                                     }
                                 });
@@ -360,43 +287,37 @@ public class KLineServiceImpl implements KLineService {
     }
 
     @Override
-    public void remove(User from, String hostmask, String sid) {
-        List<KLine> klines = klineList.stream()
-            .filter(e -> e.toHostmask().equals(hostmask))
-            .filter(e -> StringUtils.equalsIgnoreCase(e.getSid(), sid))
-            .collect(Collectors.toList());
+    public void loadFromAPI() {
+        List<KLineDTO> response = WebClient.create(apiURL)
+            .get()
+            .headers(headers -> headers.setBasicAuth(apiUsername, apiPassword))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<KLineDTO>>() {
+            })
+            .block();
 
-        if (klines.isEmpty()) {
-            if(from != null) {
-                ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), "K-line could not be found");
-            }
+        // Remove K-Lines that came from webservice originally
+        klineList.removeIf(e -> e.getType() == KLineType.WEB);
 
-            return;
-        }
+        List<KLine> webServiceKLineList = new ArrayList<>();
+        response.stream().map(e -> KLineMapper.map(e)).forEach(e -> webServiceKLineList.add(e));
 
-        for (KLine kline : klines) {
-            String url = Util.appendPathToURL(apiURL, String.valueOf(kline.getId()));
+        LOGGER.info("Loaded {} K-Lines from webservice", webServiceKLineList.size());
+        klineList.addAll(webServiceKLineList);
+        persistenceService.save();
 
-            WebClient.create(url.toString())
-                    .delete()
-                    .headers(headers -> headers.setBasicAuth(apiUsername, apiPassword))
-                    .retrieve()
-                    .toBodilessEntity()
-                    .doOnError(e -> {
-                        String message = String.format("Could not remove TKLine: API request failed: %s", e.getMessage());
+        if (ircServiceTask.getIRCConnection().getConnectionStatus() == ConnectionStatus.REGISTERED) {
+            String message = String.format("Loaded %d K-Lines", klineList.size());
+            ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
 
-                        if(from != null) {
-                            ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), message);
-                        }
-
-                        ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
-                    })
-                    .subscribe(
-                            response -> {
-                                ircConnectionService.send(ircServiceTask.getIRCConnection(), "ENCAP %s UNTKLINE %s", "*", hostmask);
-                                removeKLine(kline, from);
-                            }
-                    );
+            ScannerThread.getInstance().runOnThread(new Runnable() {
+                @Override
+                public void run() {
+                    for (KLine kline : klineList) {
+                        enforceKLine(kline, null, false);
+                    }
+                }
+            });
         }
     }
 
@@ -416,5 +337,13 @@ public class KLineServiceImpl implements KLineService {
     @Override
     public void removeAllWithType(KLineType type) {
         klineList.removeIf(e -> e.getType() == type);
+    }
+
+    @Override
+    public long createCheckSum() {
+        return klineList.stream()
+            .filter(e -> e.getType() == KLineType.WEB)
+            .map(e -> e.getId())
+            .collect(Collectors.summingLong(Long::longValue));
     }
 }

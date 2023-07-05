@@ -2,20 +2,18 @@ package com.ircnet.service.operserv.web;
 
 import com.ircnet.service.operserv.Util;
 import com.ircnet.service.operserv.irc.IRCUser;
-import com.ircnet.service.operserv.kline.KLine;
-import com.ircnet.service.operserv.kline.KLineDTO;
-import com.ircnet.service.operserv.kline.KLineMapper;
-import com.ircnet.service.operserv.kline.KLineService;
+import com.ircnet.service.operserv.kline.*;
 import com.ircnet.service.operserv.match.MatchService;
-import com.ircnet.service.operserv.web.dto.WhoDTO;
-import com.ircnet.service.operserv.web.dto.WhoReplyDTO;
-import com.ircnet.service.operserv.web.dto.WhoUserDTO;
+import com.ircnet.service.operserv.web.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,7 +33,7 @@ public class ApiController {
   public ResponseEntity<Object> addKLine(@RequestBody KLineDTO klineDTO) {
     LOGGER.debug("Received {}", klineDTO);
     KLine kline = KLineMapper.map(klineDTO);
-    klineService.create(null, kline, klineDTO.getDuration(), false);
+    klineService.create(null, kline, klineDTO.getDuration());
 
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
@@ -56,12 +54,18 @@ public class ApiController {
   @RequestMapping(value = "/k-line/reload", method = RequestMethod.POST)
   public ResponseEntity<Object> reloadKLines() {
     LOGGER.debug("Refetching K-Lines");
-    klineService.loadFromAPI(null);
-    return ResponseEntity.status(HttpStatus.OK).build();
+    try {
+      klineService.loadFromAPI();
+      return ResponseEntity.status(HttpStatus.OK).build();
+    }
+    catch (Exception e) {
+      LOGGER.warn("Could not reload K-Lines", e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorDTO(e.getMessage()));
+    }
   }
 
   @RequestMapping(value = "/who", method = RequestMethod.POST)
-  public ResponseEntity<Object> who(@RequestBody WhoDTO whoDTO) {
+  public ResponseEntity<WhoReplyDTO> who(@RequestBody WhoDTO whoDTO) {
     boolean isIpAddressOrRange = Util.isIpAddressOrRange(whoDTO.getHostname());
     List<IRCUser> matchingUsers = matchService.findMatching(whoDTO.getUsername(), whoDTO.getHostname(),
         isIpAddressOrRange, whoDTO.getSid(), whoDTO.getAccount());
@@ -70,6 +74,13 @@ public class ApiController {
     whoReplyDTO.setUsers(whoUserDTOs);
     whoReplyDTO.setTotal(whoUserDTOs.size());
     return ResponseEntity.status(HttpStatus.OK).body(whoReplyDTO);
+  }
+
+  @RequestMapping(value = "/integrity-check", method = RequestMethod.POST)
+  public ResponseEntity<IntegrityCheckDTO> integrityCheck() {
+    IntegrityCheckDTO integrityCheckDTO = new IntegrityCheckDTO();
+    integrityCheckDTO.setKlineChecksum(klineService.createCheckSum());
+    return ResponseEntity.status(HttpStatus.OK).body(integrityCheckDTO);
   }
 
   private WhoUserDTO mapIRCUser(IRCUser ircUser) {

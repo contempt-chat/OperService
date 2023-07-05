@@ -31,10 +31,6 @@ public class PersistenceServiceImpl implements PersistenceService {
   private List<KLine> klineList;
 
   @Autowired
-  @Qualifier("authorizedAccounts")
-  private List<String> authorizedAccounts;
-
-  @Autowired
   private ObjectMapper objectMapper;
 
   @Autowired
@@ -66,9 +62,8 @@ public class PersistenceServiceImpl implements PersistenceService {
       List<KLine> klinesToSave = klineService.findAllNotExpired();
       PersistedData dataToSave = new PersistedData();
       dataToSave.setKlineList(klineList);
-      dataToSave.setAuthorizedAccounts(authorizedAccounts);
       objectMapper.writeValue(file, dataToSave);
-      LOGGER.debug("Saved {} K-Lines and {} SASL accounts to {}", klinesToSave.size(), authorizedAccounts.size(), KLINE_FILE_NAME);
+      LOGGER.debug("Saved {} K-Lines", klinesToSave.size(), KLINE_FILE_NAME);
     }
     catch (IOException e) {
       LOGGER.error("Could not K-Lines to {}", KLINE_FILE_NAME, e);
@@ -89,14 +84,7 @@ public class PersistenceServiceImpl implements PersistenceService {
         klineList.addAll(klinesFromFile);
       }
 
-      List<String> authorizedAccountsFromFile = data.getAuthorizedAccounts() != null ? data.getAuthorizedAccounts() : new ArrayList<>();
-
-      if(CollectionUtils.isNotEmpty(authorizedAccountsFromFile)) {
-        authorizedAccounts.clear();
-        authorizedAccounts.addAll(authorizedAccountsFromFile);
-      }
-
-      LOGGER.info("Loaded {} K-Lines and {} SASL accounts from {}", klinesFromFile.size(), authorizedAccountsFromFile.size(), KLINE_FILE_NAME);
+      LOGGER.info("Loaded {} K-Lines from {}", klinesFromFile.size(), KLINE_FILE_NAME);
     }
     catch (IOException e) {
       LOGGER.error("Could not load K-Lines from {}", KLINE_FILE_NAME);

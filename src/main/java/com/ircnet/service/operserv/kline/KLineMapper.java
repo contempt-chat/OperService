@@ -24,10 +24,7 @@ public class KLineMapper {
     kline.setCreatedBy(klineDTO.getRequestedBy());
 
     if(klineDTO.getId() != null) {
-      kline.setType(KLineType.SYNCED);
-    }
-    else {
-      kline.setType(KLineType.NOT_SYNCED);
+      kline.setType(KLineType.WEB);
     }
 
     if (klineDTO.getDuration() != null && klineDTO.getDuration() > 0) {

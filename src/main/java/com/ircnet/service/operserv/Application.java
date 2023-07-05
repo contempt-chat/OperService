@@ -6,7 +6,6 @@ import com.ircnet.service.operserv.kline.KLine;
 import com.ircnet.service.operserv.kline.KLineService;
 import com.ircnet.service.operserv.kline.KLineType;
 import com.ircnet.service.operserv.persistence.PersistenceService;
-import com.ircnet.service.operserv.sasl.AccountService;
 import com.ircnet.service.operserv.tor.TorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +33,6 @@ public class Application extends SpringBootServletInitializer implements Command
     private IRCServiceTask ircServiceTask;
 
     @Autowired
-    private AccountService accountService;
-
-    @Autowired
     private KLineService klineService;
 
     @Autowired
@@ -44,10 +40,6 @@ public class Application extends SpringBootServletInitializer implements Command
 
     @Autowired
     private TorService torService;
-
-    @Autowired
-    @Qualifier("authorizedAccounts")
-    private List<String> authorizedAccounts;
 
     @Autowired
     @Qualifier("klineList")
@@ -71,11 +63,6 @@ public class Application extends SpringBootServletInitializer implements Command
 
         // Load data from file
         persistenceService.load();
-
-        // Load authorized SASL accounts from webservice on first start
-        if(authorizedAccounts.isEmpty()) {
-            accountService.loadFromAPI(null);
-        }
 
         // Load K-Lines from webservice on first start
         if(klineList.isEmpty()) {

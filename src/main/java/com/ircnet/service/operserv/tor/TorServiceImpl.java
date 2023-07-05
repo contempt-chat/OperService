@@ -71,10 +71,11 @@ public class TorServiceImpl implements TorService {
 
                 klineService.removeAllWithType(KLineType.TOR);
                 klineList.addAll(newKLines);
-                persistenceService.save();
 
                 String message = String.format("Loaded %d Tor Exit Nodes", ipSet.size());
                 LOGGER.info(message);
+
+                persistenceService.save();
 
                 if (ircServiceTask.getIRCConnection().getConnectionStatus() == ConnectionStatus.REGISTERED) {
                     ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
@@ -83,7 +84,7 @@ public class TorServiceImpl implements TorService {
                         @Override
                         public void run() {
                             for (KLine kline : newKLines) {
-                                klineService.enforceKLine(kline, null, false, false);
+                                klineService.enforceKLine(kline, null, false);
                             }
                         }
                     });

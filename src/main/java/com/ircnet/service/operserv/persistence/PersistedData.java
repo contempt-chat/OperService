@@ -16,11 +16,6 @@ public class PersistedData {
    */
   private List<KLine> klineList;
 
-  /**
-   * A list of SASL accounts that are allowed to use this service.
-   */
-  private List<String> authorizedAccounts;
-
   public PersistedData() {
   }
 
@@ -30,13 +25,5 @@ public class PersistedData {
 
   public void setKlineList(List<KLine> klineList) {
     this.klineList = klineList;
-  }
-
-  public List<String> getAuthorizedAccounts() {
-    return authorizedAccounts;
-  }
-
-  public void setAuthorizedAccounts(List<String> authorizedAccounts) {
-    this.authorizedAccounts = authorizedAccounts;
   }
 }

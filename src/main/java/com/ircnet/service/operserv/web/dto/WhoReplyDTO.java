@@ -6,9 +6,6 @@ public class WhoReplyDTO {
   private List<WhoUserDTO> users;
   private int total;
 
-  public WhoReplyDTO() {
-  }
-
   public List<WhoUserDTO> getUsers() {
     return users;
   }

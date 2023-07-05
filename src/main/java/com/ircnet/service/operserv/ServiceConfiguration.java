@@ -112,26 +112,12 @@ public class ServiceConfiguration {
         return new SQueryCommandHelp("HELP");
     }
 
-    @Bean
-    public SQueryCommandReload squeryCommandReload() {
-        return new SQueryCommandReload("RELOAD");
-    }
-
-    @Bean
-    public SQueryCommandStatus sQueryCommandStatus() {
-        return new SQueryCommandStatus("STATUS");
-    }
-
     @Bean("squeryCommandMap")
     public Map<String, SQueryCommand> squeryCommandMap(SQueryCommandAdmin squeryCommandAdmin,
                                                        SQueryCommandVersion squeryCommandVersion,
                                                        SQueryCommandInfo squeryCommandInfo,
-                                                       SQueryCommandHelp squeryCommandHelp,
-                                                       SQueryCommandReload squeryCommandReload,
-                                                       SQueryCommandStatus sQueryCommandStatus) {
+                                                       SQueryCommandHelp squeryCommandHelp) {
         Map<String, SQueryCommand> commandMap = new LinkedCaseInsensitiveMap<>();
-        addCommand(commandMap, squeryCommandReload);
-        addCommand(commandMap, sQueryCommandStatus);
         addCommand(commandMap, squeryCommandAdmin);
         addCommand(commandMap, squeryCommandInfo);
         addCommand(commandMap, squeryCommandVersion);
@@ -161,27 +147,11 @@ public class ServiceConfiguration {
     }
 
     /**
-     * A list of K-Lines received from the webservice.
-     */
-    @Bean("webServiceKLineList")
-    public List<KLine> webServiceKLineList() {
-        return new ArrayList<>();
-    }
-
-    /**
-     * Complete list of K-Lines (webservice + Tor).
+     * List of K-Lines.
      */
     @Bean("klineList")
     public List<KLine> klineList() {
         return new CopyOnWriteArrayList();
-    }
-
-    /**
-     * A list of SASL accounts that are allowed to use this service.
-     */
-    @Bean("authorizedAccounts")
-    public List<String> authorizedAccounts() {
-        return new ArrayList<>();
     }
 
     /**

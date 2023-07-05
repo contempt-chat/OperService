@@ -4,7 +4,6 @@ import com.ircnet.library.common.connection.IRCConnectionService;
 import com.ircnet.library.common.event.AbstractEventListener;
 import com.ircnet.library.service.IRCServiceTask;
 import com.ircnet.library.service.event.SQueryEvent;
-import com.ircnet.service.operserv.sasl.AccountService;
 import com.ircnet.service.operserv.squery.SQueryCommand;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -30,9 +29,6 @@ public class SQueryEventListener extends AbstractEventListener<SQueryEvent> {
     @Autowired
     private IRCServiceTask ircServiceTask;
 
-    @Autowired
-    private AccountService accountService;
-
     @Value("${service.name}")
     private String serviceName;
 
@@ -55,21 +51,11 @@ public class SQueryEventListener extends AbstractEventListener<SQueryEvent> {
         SQueryCommand squeryCommand = squeryCommandMap.get(parts[0]);
 
         if(squeryCommand != null) {
-            if(hasAccess(event.getMessageTags())) {
-                squeryCommand.processCommand(event.getFrom(), event.getMessageTags(), event.getMessage());
-            }
-            else {
-                ircConnectionService.notice(ircServiceTask.getIRCConnection(), nick, "Access denied.");
-            }
+            squeryCommand.processCommand(event.getFrom(), event.getMessageTags(), event.getMessage());
         }
 
         else {
             ircConnectionService.notice(ircServiceTask.getIRCConnection(), nick, "Unrecognized command: \"%s\". Use /SQUERY %s HELP\n", parts[0], serviceName);
         }
-    }
-
-    private boolean hasAccess(Map<String, String> tags) {
-        String account = tags.get("account");
-        return accountService.isAuthorized(account);
     }
 }

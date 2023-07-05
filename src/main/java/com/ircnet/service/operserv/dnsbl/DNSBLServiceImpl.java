@@ -231,7 +231,7 @@ public class DNSBLServiceImpl implements DNSBLervice {
     kline.setExpirationDate(new Date(System.currentTimeMillis() + TKLINE_DURATION * 1000L));
     kline.setReason(String.format(provider.getKLineReason(aRecords).replace("{ip}", request.getIpAddress())));
 
-    klineService.create(null, kline, TKLINE_DURATION, false);
+    klineService.create(null, kline, TKLINE_DURATION);
   }
 
   /**

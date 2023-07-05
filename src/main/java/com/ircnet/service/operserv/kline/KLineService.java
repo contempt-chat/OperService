@@ -1,7 +1,6 @@
 package com.ircnet.service.operserv.kline;
 
 import com.ircnet.library.common.User;
-import com.ircnet.library.common.connection.IRCConnection;
 import com.ircnet.service.operserv.irc.IRCUser;
 
 import java.util.List;
@@ -21,19 +20,17 @@ public interface KLineService {
    * @param fromAccount The SASL account of the user who creates this K-Line
    * @param duration Duration in seconds when this K-Line expires, or null
    * @param sid A SID pattern if the K-Line is not global, otherwise null
-   * @param dryRun true if this is just a dry run, only simulates K-Line and show who would get banned
    * @param isLocal true if the K-Line should not be sent to the webservice
    */
-  void create(String username, String hostname, boolean isIpAddressOrRange, String reason, User from, String fromAccount, Long duration, String sid, boolean dryRun, boolean isLocal);
+  //void create(String username, String hostname, boolean isIpAddressOrRange, String reason, User from, String fromAccount, Long duration, String sid, boolean isLocal);
 
   /**
    * Creates a new K-Line
    * @param from  If SQUERY was used to create the K-Line, the user is stored here, otherwise null
    * @param kline A K-Line
    * @param originalDuration Duration in seconds when this K-Line expires, or null
-   * @param dryRun true if this is just a dry run, only simulates K-Line and show who would get banned
    */
-  void create(User from, KLine kline, Long originalDuration, boolean dryRun);
+  void create(User from, KLine kline, Long originalDuration);
 
   /**
    * Finds the first K-Line that matches the given user.
@@ -64,7 +61,7 @@ public interface KLineService {
    * @param types A list of types
    * @return A list of K-Lines
    */
-  List<KLine> findAllWithTypes(KLineType... types);
+  //List<KLine> findAllWithTypes(KLineType... types);
 
   /**
    * Returns all expired K-Lines.
@@ -87,9 +84,8 @@ public interface KLineService {
    * @param kline A K-Line
    * @param from The creator of the K-Line, used to notice him that the K-Line gets enforced
    * @param skipAuthenticatedUsers true to not send a K-Line for authenticated users
-   * @param dryRun true if this is just a dry run, only simulates K-Line and show who would get banned
    */
-  void enforceKLine(KLine kline, User from, boolean skipAuthenticatedUsers, boolean dryRun);
+  void enforceKLine(KLine kline, User from, boolean skipAuthenticatedUsers);
 
   /**
    * Sends a K-Line to an IRC server.
@@ -107,6 +103,11 @@ public interface KLineService {
   void loadFromAPI(User from);
 
   /**
+   * TODO.
+   */
+  void loadFromAPI();
+
+  /**
    * Removes a K-Line.
    *
    * @param from If this method was executed by SQUERY, the user is stored here
@@ -114,7 +115,7 @@ public interface KLineService {
    * @param sid If the K-Line is not global, the SID of the server(s) where the K-Line should be removed.
    *            This parameter cannot be used to convert a global K-Line into a local K-Line.
    */
-  void remove(User from, String hostmask, String sid);
+  //void remove(User from, String hostmask, String sid);
 
   /**
    * Removes a K-Line.
@@ -131,4 +132,10 @@ public interface KLineService {
    * @param type A K-Line type
    */
   void removeAllWithType(KLineType type);
+
+  /**
+   * TODO.
+   * @return
+   */
+  long createCheckSum();
 }
