@@ -1,12 +1,15 @@
 package com.ircnet.service.operserv.web.dto;
 
-import com.ircnet.service.operserv.IpAddressFamily;
-
 public class WhoUserDTO {
   /**
    * SID of the server the user is connected to.
    */
   private String sid;
+
+  /**
+   * Name of the server the user is connected to.
+   */
+  private String serverName;
 
   /**
    * UID.
@@ -54,6 +57,14 @@ public class WhoUserDTO {
 
   public void setSid(String sid) {
     this.sid = sid;
+  }
+
+  public String getServerName() {
+    return serverName;
+  }
+
+  public void setServerName(String serverName) {
+    this.serverName = serverName;
   }
 
   public String getUid() {

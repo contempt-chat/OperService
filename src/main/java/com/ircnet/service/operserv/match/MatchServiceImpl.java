@@ -21,7 +21,7 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public boolean isMatching(IRCUser user, String username, String hostname, boolean isIpAddressOrRange, String sid) {
         // Check SID
-        if(StringUtils.isNotEmpty(sid) && !Util.matches(user.getSid(), sid)) {
+        if(StringUtils.isNotEmpty(sid) && !Util.matches(user.getServer().getSid(), sid)) {
             return false;
         }
 

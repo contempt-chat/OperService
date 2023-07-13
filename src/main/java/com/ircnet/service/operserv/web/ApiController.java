@@ -2,18 +2,18 @@ package com.ircnet.service.operserv.web;
 
 import com.ircnet.service.operserv.Util;
 import com.ircnet.service.operserv.irc.IRCUser;
-import com.ircnet.service.operserv.kline.*;
+import com.ircnet.service.operserv.kline.KLine;
+import com.ircnet.service.operserv.kline.KLineDTO;
+import com.ircnet.service.operserv.kline.KLineMapper;
+import com.ircnet.service.operserv.kline.KLineService;
 import com.ircnet.service.operserv.match.MatchService;
 import com.ircnet.service.operserv.web.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,7 +85,8 @@ public class ApiController {
 
   private WhoUserDTO mapIRCUser(IRCUser ircUser) {
     WhoUserDTO whoUserDTO = new WhoUserDTO();
-    whoUserDTO.setSid(ircUser.getSid());
+    whoUserDTO.setSid(ircUser.getServer().getSid());
+    whoUserDTO.setServerName(ircUser.getServer().getName());
     whoUserDTO.setNick(ircUser.getNick());
     whoUserDTO.setUsername(ircUser.getUser());
     whoUserDTO.setHost(ircUser.getHost());

@@ -8,9 +8,9 @@ import com.ircnet.service.operserv.IpAddressFamily;
  */
 public class IRCUser {
   /**
-   * SID of the server the user is connected to.
+   * The server the user is connected to.
    */
-  private String sid;
+  private IRCServer server;
 
   /**
    * UID.
@@ -60,12 +60,12 @@ public class IRCUser {
   public IRCUser() {
   }
 
-  public String getSid() {
-    return sid;
+  public IRCServer getServer() {
+    return server;
   }
 
-  public void setSid(String sid) {
-    this.sid = sid;
+  public void setServer(IRCServer server) {
+    this.server = server;
   }
 
   public String getUid() {
