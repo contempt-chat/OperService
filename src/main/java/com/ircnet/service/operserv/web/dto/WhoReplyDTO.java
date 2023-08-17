@@ -1,24 +1,11 @@
 package com.ircnet.service.operserv.web.dto;
 
+import lombok.Data;
+
 import java.util.List;
 
+@Data
 public class WhoReplyDTO {
   private List<WhoUserDTO> users;
   private int total;
-
-  public List<WhoUserDTO> getUsers() {
-    return users;
-  }
-
-  public void setUsers(List<WhoUserDTO> users) {
-    this.users = users;
-  }
-
-  public int getTotal() {
-    return total;
-  }
-
-  public void setTotal(int total) {
-    this.total = total;
-  }
 }

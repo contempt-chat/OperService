@@ -1,5 +1,8 @@
 package com.ircnet.service.operserv.web.dto;
 
+import lombok.Data;
+
+@Data
 public class WhoUserDTO {
   /**
    * SID of the server the user is connected to.
@@ -45,76 +48,4 @@ public class WhoUserDTO {
    * Real name.
    */
   private String realName;
-
-  public String getSid() {
-    return sid;
-  }
-
-  public void setSid(String sid) {
-    this.sid = sid;
-  }
-
-  public String getUid() {
-    return uid;
-  }
-
-  public void setUid(String uid) {
-    this.uid = uid;
-  }
-
-  public String getNick() {
-    return nick;
-  }
-
-  public void setNick(String nick) {
-    this.nick = nick;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public String getHost() {
-    return host;
-  }
-
-  public void setHost(String host) {
-    this.host = host;
-  }
-
-  public String getIpAddress() {
-    return ipAddress;
-  }
-
-  public void setIpAddress(String ipAddress) {
-    this.ipAddress = ipAddress;
-  }
-
-  public String getUserModes() {
-    return userModes;
-  }
-
-  public void setUserModes(String userModes) {
-    this.userModes = userModes;
-  }
-
-  public String getAccount() {
-    return account;
-  }
-
-  public void setAccount(String account) {
-    this.account = account;
-  }
-
-  public String getRealName() {
-    return realName;
-  }
-
-  public void setRealName(String realName) {
-    this.realName = realName;
-  }
 }

@@ -1,6 +1,7 @@
 package com.ircnet.service.operserv.kline;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
 
 import java.util.Date;
 
@@ -8,6 +9,7 @@ import java.util.Date;
  * Represents a K-Line that has been added on this service.
  * K-Lines will be enforced when a matching user connects to IRC.
  */
+@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class KLine {
   /**
@@ -63,81 +65,6 @@ public class KLine {
    * K-Line type to distinguish if the K-Line comes from web or from Tor services etc.
    */
   private KLineType type;
-
-  public KLine() {
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public String getHostname() {
-    return hostname;
-  }
-
-  public void setHostname(String hostname) {
-    this.hostname = hostname;
-  }
-
-  public boolean isIpAddressOrRange() {
-    return ipAddressOrRange;
-  }
-
-  public void setIpAddressOrRange(boolean ipAddressOrRange) {
-    this.ipAddressOrRange = ipAddressOrRange;
-  }
-
-  public String getReason() {
-    return reason;
-  }
-
-  public void setReason(String reason) {
-    this.reason = reason;
-  }
-
-  public String getCreatedBy() {
-    return createdBy;
-  }
-
-  public void setCreatedBy(String createdBy) {
-    this.createdBy = createdBy;
-  }
-
-  public Date getExpirationDate() {
-    return expirationDate;
-  }
-
-  public void setExpirationDate(Date expirationDate) {
-    this.expirationDate = expirationDate;
-  }
-
-  public String getSid() {
-    return sid;
-  }
-
-  public void setSid(String sid) {
-    this.sid = sid;
-  }
-
-  public KLineType getType() {
-    return type;
-  }
-
-  public void setType(KLineType type) {
-    this.type = type;
-  }
 
   @Override
   public String toString() {
