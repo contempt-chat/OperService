@@ -1,5 +1,5 @@
 package com.ircnet.service.operserv.irc;
-// Checked (FIXME)
+
 /**
  * Services for managing users that are connected to IRC.
  */

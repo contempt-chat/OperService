@@ -1,7 +1,6 @@
 package com.ircnet.service.operserv.kline;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 

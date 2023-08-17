@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-// Checked (FIXME)
+
 /**
  * Converts strings like 1w2d3h4m5s into seconds.
  */

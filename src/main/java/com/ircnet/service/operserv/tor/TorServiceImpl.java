@@ -4,6 +4,7 @@ import com.ircnet.library.common.connection.ConnectionStatus;
 import com.ircnet.library.common.connection.IRCConnectionService;
 import com.ircnet.library.service.IRCServiceTask;
 import com.ircnet.service.operserv.ScannerThread;
+import com.ircnet.service.operserv.ServiceProperties;
 import com.ircnet.service.operserv.kline.KLine;
 import com.ircnet.service.operserv.kline.KLineService;
 import com.ircnet.service.operserv.kline.KLineType;
@@ -12,14 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
 
-// Checked (FIXME)
 @Service
 public class TorServiceImpl implements TorService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TorServiceImpl.class);
@@ -31,9 +30,6 @@ public class TorServiceImpl implements TorService {
     @Autowired
     private KLineService klineService;
 
-    @Value("${service.channel}")
-    private String serviceChannel;
-
     @Autowired
     private IRCServiceTask ircServiceTask;
 
@@ -42,6 +38,9 @@ public class TorServiceImpl implements TorService {
 
     @Autowired
     private PersistenceService persistenceService;
+
+    @Autowired
+    private ServiceProperties properties;
 
     @Override
     public void loadFromWeb() {
@@ -78,7 +77,7 @@ public class TorServiceImpl implements TorService {
                 persistenceService.save();
 
                 if (ircServiceTask.getIRCConnection().getConnectionStatus() == ConnectionStatus.REGISTERED) {
-                    ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
+                    ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
 
                     ScannerThread.getInstance().runOnThread(new Runnable() {
                         @Override
@@ -104,7 +103,7 @@ public class TorServiceImpl implements TorService {
                             LOGGER.info(message);
 
                             if (ircServiceTask.getIRCConnection().getConnectionStatus() == ConnectionStatus.REGISTERED) {
-                                ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
+                                ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
                             }
 
                             return Mono.just(new ArrayList<>());

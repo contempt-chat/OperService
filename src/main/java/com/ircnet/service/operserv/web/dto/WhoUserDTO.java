@@ -1,7 +1,5 @@
 package com.ircnet.service.operserv.web.dto;
 
-import com.ircnet.service.operserv.IpAddressFamily;
-
 public class WhoUserDTO {
   /**
    * SID of the server the user is connected to.

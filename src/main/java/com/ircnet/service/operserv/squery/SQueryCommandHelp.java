@@ -1,17 +1,18 @@
 package com.ircnet.service.operserv.squery;
 
 import com.ircnet.library.common.User;
+import com.ircnet.service.operserv.ServiceProperties;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
-// Checked (FIXME)
+
 /**
  * Handler for: /SQUERY OperService HELP
  */
 public class SQueryCommandHelp extends SQueryCommand {
-    @Value("${service.name}")
-    private String serviceName;
+    @Autowired
+    private ServiceProperties properties;
 
     private Map<String, SQueryCommand> squeryCommandMap;
 
@@ -32,8 +33,8 @@ public class SQueryCommandHelp extends SQueryCommand {
 
         if(parts.length == 1) {
             // HELP
-            notice(from.getNick(), "%s help index", serviceName); // FIXME: index?
-            notice(from.getNick(), "Use /SQUERY %s %s <topic>", serviceName, commandName);
+            notice(from.getNick(), "%s help index", properties.getName()); // FIXME: index?
+            notice(from.getNick(), "Use /SQUERY %s %s <topic>", properties.getName(), commandName);
             notice(from.getNick(), "Available topics: %s", StringUtils.join((squeryCommandMap).keySet(), ", "));
         }
         else {
@@ -44,7 +45,7 @@ public class SQueryCommandHelp extends SQueryCommand {
                 squeryCommand.processHelp(from, message);
             }
             else {
-                notice(from.getNick(), "No such help topic: \"%s\". Use /SQUERY %s %s", parts[1], serviceName, commandName);
+                notice(from.getNick(), "No such help topic: \"%s\". Use /SQUERY %s %s", parts[1], properties.getName(), commandName);
             }
         }
     }
@@ -58,7 +59,7 @@ public class SQueryCommandHelp extends SQueryCommand {
     @Override
     public void processHelp(User from, String message) {
         String[] parts = message.split(" ");
-        notice(from.getNick(), "No such help topic: \"%s\". Use /SQUERY %s HELP", parts[1], serviceName);
+        notice(from.getNick(), "No such help topic: \"%s\". Use /SQUERY %s HELP", parts[1], properties.getName());
     }
 
     public void setSqueryCommandMap(Map<String, SQueryCommand> squeryCommandMap) {

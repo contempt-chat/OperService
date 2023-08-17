@@ -4,7 +4,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.validator.routines.InetAddressValidator;
 import org.springframework.security.web.util.matcher.IpAddressMatcher;
-// Checked (FIXME)
+
 /**
  * Helper methods.
  */

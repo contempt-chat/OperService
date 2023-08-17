@@ -3,7 +3,7 @@ package com.ircnet.service.operserv.match;
 import com.ircnet.service.operserv.irc.IRCUser;
 
 import java.util.List;
-// Checked (FIXME)
+
 /**
  * Contains methods for matching against wildcards or CIDR notation.
  */

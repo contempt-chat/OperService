@@ -1,21 +1,19 @@
 package com.ircnet.service.operserv.squery;
 
 import com.ircnet.library.common.User;
-import org.springframework.beans.factory.annotation.Value;
+import com.ircnet.service.operserv.ServiceProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
-// Checked (FIXME)
+
 /**
  * Handler for:
  *  - /SQUERY OperService ADMIN
  *  - /SQUERY OperService HELP ADMIN
  */
 public class SQueryCommandAdmin extends SQueryCommand {
-    @Value("${service.name}")
-    private String serviceName;
-
-    @Value("${service.squery.admin}")
-    private String serviceAdmin;
+    @Autowired
+    private ServiceProperties properties;
 
     public SQueryCommandAdmin(String commandName) {
         super(commandName);
@@ -30,8 +28,8 @@ public class SQueryCommandAdmin extends SQueryCommand {
      */
     @Override
     public void processCommand(User from, Map<String, String> tags, String message) {
-        notice(from.getNick(), "Administrative info about %s:", serviceName);
-        notice(from.getNick(), serviceAdmin);
+        notice(from.getNick(), "Administrative info about %s:", properties.getName());
+        notice(from.getNick(), properties.getSquery().getAdmin());
     }
 
     /**

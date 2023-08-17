@@ -18,7 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 import java.util.List;
-// Checked (FIXME)
+
 /**
  * Main class.
  */

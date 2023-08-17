@@ -5,6 +5,7 @@ import com.ircnet.library.common.connection.ConnectionStatus;
 import com.ircnet.library.common.connection.IRCConnectionService;
 import com.ircnet.library.service.IRCServiceTask;
 import com.ircnet.service.operserv.ScannerThread;
+import com.ircnet.service.operserv.ServiceProperties;
 import com.ircnet.service.operserv.Util;
 import com.ircnet.service.operserv.irc.IRCUser;
 import com.ircnet.service.operserv.match.MatchService;
@@ -13,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -45,27 +45,18 @@ public class KLineServiceImpl implements KLineService {
     @Autowired
     private IRCServiceTask ircServiceTask;
 
-    @Value("${sasl-webservice.kline.url}")
-    private String apiURL;
-
-    @Value("${sasl-webservice.kline.username}")
-    private String apiUsername;
-
-    @Value("${sasl-webservice.kline.password}")
-    private String apiPassword;
-
-    @Value("${service.channel}")
-    private String serviceChannel;
-
-    @Value("${service.name}")
-    private String serviceName;
+    @Autowired
+    private ServiceProperties properties;
 
     @Override
     public void create(User from, KLine kline, Long originalDuration) {
         klineList.add(kline);
 
         StringBuilder message = new StringBuilder();
-        message.append(String.format("K-Line added by %s for %s [%s]", kline.getCreatedBy() != null ? kline.getCreatedBy() : serviceName, kline.toHostmask(), kline.getReason()));
+        message.append(String.format("K-Line added by %s for %s [%s]",
+            kline.getCreatedBy() != null ? kline.getCreatedBy() : properties.getName(),
+            kline.toHostmask(),
+            kline.getReason()));
 
         if(kline.getSid() != null) {
             message.append(String.format(" on %s", kline.getSid()));
@@ -79,7 +70,7 @@ public class KLineServiceImpl implements KLineService {
             ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), message.toString());
         }
 
-        ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message.toString());
+        ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message.toString());
 
         ScannerThread.getInstance().runOnThread(new Runnable() {
             @Override
@@ -129,7 +120,7 @@ public class KLineServiceImpl implements KLineService {
                 }
 
                 LOGGER.info(message);
-                ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
+                ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
 
             }
         }
@@ -236,16 +227,16 @@ public class KLineServiceImpl implements KLineService {
 
     @Override
     public void loadFromAPI(User from) {
-        WebClient.create(apiURL)
+        WebClient.create(properties.getKlineWebservice().getUrl())
                 .get()
-                .headers(headers -> headers.setBasicAuth(apiUsername, apiPassword))
+                .headers(headers -> headers.setBasicAuth(properties.getKlineWebservice().getUsername(), properties.getKlineWebservice().getPassword()))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<KLineDTO>>() {
                 })
                 .doOnError(e -> {
                     if (ircServiceTask.getIRCConnection().getConnectionStatus() == ConnectionStatus.REGISTERED) {
                         String message = String.format("Could not load K-Lines: API request failed: %s", e.getMessage());
-                        ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
+                        ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
 
                         if (from != null) {
                             ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), message);
@@ -267,7 +258,7 @@ public class KLineServiceImpl implements KLineService {
 
                             if (ircServiceTask.getIRCConnection().getConnectionStatus() == ConnectionStatus.REGISTERED) {
                                 String message = String.format("Loaded %d K-Lines", klineList.size());
-                                ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
+                                ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
 
                                 if (from != null) {
                                     ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), message);
@@ -288,9 +279,9 @@ public class KLineServiceImpl implements KLineService {
 
     @Override
     public void loadFromAPI() {
-        List<KLineDTO> response = WebClient.create(apiURL)
+        List<KLineDTO> response = WebClient.create(properties.getKlineWebservice().getUrl())
             .get()
-            .headers(headers -> headers.setBasicAuth(apiUsername, apiPassword))
+            .headers(headers -> headers.setBasicAuth(properties.getKlineWebservice().getUsername(), properties.getKlineWebservice().getPassword()))
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<KLineDTO>>() {
             })
@@ -308,7 +299,7 @@ public class KLineServiceImpl implements KLineService {
 
         if (ircServiceTask.getIRCConnection().getConnectionStatus() == ConnectionStatus.REGISTERED) {
             String message = String.format("Loaded %d K-Lines", klineList.size());
-            ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
+            ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
 
             ScannerThread.getInstance().runOnThread(new Runnable() {
                 @Override
@@ -330,7 +321,7 @@ public class KLineServiceImpl implements KLineService {
             ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), message);
         }
 
-        ircConnectionService.notice(ircServiceTask.getIRCConnection(), serviceChannel, message);
+        ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
         persistenceService.scheduleSave();
     }
 

@@ -1,6 +1,5 @@
 package com.ircnet.service.operserv.tor;
 
-// Checked (FIXME)
 /**
  * Service for loading Tor exit nodes.
  */

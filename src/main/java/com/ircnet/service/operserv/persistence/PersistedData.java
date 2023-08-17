@@ -2,9 +2,7 @@ package com.ircnet.service.operserv.persistence;
 
 
 import com.ircnet.service.operserv.kline.KLine;
-import org.springframework.context.annotation.Bean;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

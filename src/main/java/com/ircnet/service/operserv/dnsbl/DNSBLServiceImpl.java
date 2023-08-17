@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.xbill.DNS.*;
 import org.xbill.DNS.lookup.LookupSession;
@@ -36,9 +35,6 @@ public class DNSBLServiceImpl implements DNSBLervice {
   private static final long TKLINE_DURATION = 24L * 60L * 60L;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DNSBLServiceImpl.class);
-
-  @Value("${service.name}")
-  private String serviceName;
 
   @Autowired
   private KLineService klineService;

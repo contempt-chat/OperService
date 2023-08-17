@@ -4,7 +4,7 @@ import com.ircnet.library.common.User;
 import com.ircnet.service.operserv.Constants;
 
 import java.util.Map;
-// Checked (FIXME)
+
 /**
  * Handler for:
  *  - /SQUERY OperService VERSION

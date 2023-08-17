@@ -2,10 +2,11 @@ package com.ircnet.service.operserv.event;
 
 import com.ircnet.library.common.event.AbstractEventListener;
 import com.ircnet.library.service.event.UNickEvent;
-import com.ircnet.service.operserv.ScannerThread;
-import com.ircnet.service.operserv.dnsbl.DNSBLervice;
 import com.ircnet.service.operserv.IpAddressFamily;
+import com.ircnet.service.operserv.ScannerThread;
+import com.ircnet.service.operserv.ServiceProperties;
 import com.ircnet.service.operserv.Util;
+import com.ircnet.service.operserv.dnsbl.DNSBLervice;
 import com.ircnet.service.operserv.irc.IRCUser;
 import com.ircnet.service.operserv.irc.UserService;
 import com.ircnet.service.operserv.kline.KLine;
@@ -14,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -30,19 +30,16 @@ public class UNickEventListener extends AbstractEventListener<UNickEvent> {
     @Autowired
     private DNSBLervice dblService;
 
-    @Value("${service.channel}")
-    private String serviceChannel;
-
-    @Value("${service.channel.clients:#{null}}")
-    private String clientsChannel;
+    @Autowired
+    private ServiceProperties properties;
 
     protected void onEvent(UNickEvent event) {
         LOGGER.trace("UNickEvent sid={} uid={} nick={} user={} host={} ipAddress={} userModes={} account={} realName={}",
                 event.getSid(), event.getUid(), event.getNick(), event.getUser(), event.getHost(), event.getIpAddress(),
                 event.getUserModes(), event.getAccount(), event.getRealName());
 
-        if(!event.getIRCConnection().isBurst() && StringUtils.isNotBlank(clientsChannel)) {
-            ircConnectionService.notice(event.getIRCConnection(), clientsChannel, "%s %s %s@%s CONN %s account=%s realName=%s",
+        if(!event.getIRCConnection().isBurst() && StringUtils.isNotBlank(properties.getClientsChannel())) {
+            ircConnectionService.notice(event.getIRCConnection(), properties.getClientsChannel(), "%s %s %s@%s CONN %s account=%s realName=%s",
                 event.getUid(), event.getNick(), event.getUser(), event.getHost(), event.getIpAddress(),
                 event.getAccount(), event.getRealName());
         }
@@ -85,7 +82,7 @@ public class UNickEventListener extends AbstractEventListener<UNickEvent> {
                     String message = String.format("Enforcing TKLine on %s for %s (%s@%s) matching %s: %s",
                             user.getSid(), user.getNick(), user.getUser(), user.getHost(), kline.toHostmask(), kline.getReason());
                     LOGGER.info(message);
-                    ircConnectionService.notice(event.getIRCConnection(), serviceChannel, message);
+                    ircConnectionService.notice(event.getIRCConnection(), properties.getChannel(), message);
                     klineService.enforceKLine(kline, user.getSid());
                 }
 

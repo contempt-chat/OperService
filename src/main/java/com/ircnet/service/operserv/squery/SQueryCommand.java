@@ -8,7 +8,7 @@ import org.apache.commons.cli.Options;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
-// Checked (FIXME)
+
 /**
  * Handler for:
  *  - /SQUERY OperService COMMAND
