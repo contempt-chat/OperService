@@ -85,7 +85,8 @@ public class ApiController {
 
   private WhoUserDTO mapIRCUser(IRCUser ircUser) {
     WhoUserDTO whoUserDTO = new WhoUserDTO();
-    whoUserDTO.setSid(ircUser.getSid());
+    whoUserDTO.setSid(ircUser.getServer().getSid());
+    whoUserDTO.setServerName(ircUser.getServer().getName());
     whoUserDTO.setNick(ircUser.getNick());
     whoUserDTO.setUsername(ircUser.getUser());
     whoUserDTO.setHost(ircUser.getHost());

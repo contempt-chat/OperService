@@ -10,9 +10,9 @@ import lombok.Data;
 @Data
 public class IRCUser {
   /**
-   * SID of the server the user is connected to.
+   * The server the user is connected to.
    */
-  private String sid;
+  private IRCServer server;
 
   /**
    * UID.

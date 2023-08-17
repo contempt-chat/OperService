@@ -30,6 +30,12 @@ public class EventRegistrationService {
     private QuitEventListener quitEventListener;
 
     @Autowired
+    private ServerEventListener serverEventListener;
+
+    @Autowired
+    private SQuitEventListener squitEventListener;
+
+    @Autowired
     private PermissionDeniedEventListener permissionDeniedEventListener;
 
     @PostConstruct
@@ -42,6 +48,8 @@ public class EventRegistrationService {
         eventBus.registerEventListener(unickEventListener);
         eventBus.registerEventListener(nickChangedEventListener);
         eventBus.registerEventListener(quitEventListener);
+        eventBus.registerEventListener(serverEventListener);
+        eventBus.registerEventListener(squitEventListener);
         eventBus.registerEventListener(squeryEventListener);
         eventBus.registerEventListener(youAreServiceEventListener);
         eventBus.registerEventListener(permissionDeniedEventListener);

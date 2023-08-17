@@ -90,11 +90,11 @@ public class KLineServiceImpl implements KLineService {
             Map<String, List<IRCUser>> sidUserMap = new HashMap<>();
 
             for (IRCUser user : matchingUsers) {
-                List<IRCUser> userList = sidUserMap.get(user.getSid());
+                List<IRCUser> userList = sidUserMap.get(user.getServer().getSid());
 
                 if (userList == null) {
                     userList = new ArrayList<>();
-                    sidUserMap.put(user.getSid(), userList);
+                    sidUserMap.put(user.getServer().getSid(), userList);
                 }
 
                 userList.add(user);
@@ -110,7 +110,7 @@ public class KLineServiceImpl implements KLineService {
         for (IRCUser user : userList) {
             if(from != null) {
                 String message = String.format("Enforcing TKLine on %s for %s (%s@%s) matching %s [%s]",
-                    user.getSid(),
+                    user.getServer().getName(),
                     user.getNick(), user.getUser(), user.getHost(),
                     kline.toHostmask(),
                     kline.getReason());

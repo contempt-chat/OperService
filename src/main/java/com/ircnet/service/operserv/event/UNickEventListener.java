@@ -8,6 +8,7 @@ import com.ircnet.service.operserv.ServiceProperties;
 import com.ircnet.service.operserv.Util;
 import com.ircnet.service.operserv.dnsbl.DNSBLervice;
 import com.ircnet.service.operserv.irc.IRCUser;
+import com.ircnet.service.operserv.irc.ServerService;
 import com.ircnet.service.operserv.irc.UserService;
 import com.ircnet.service.operserv.kline.KLine;
 import com.ircnet.service.operserv.kline.KLineService;
@@ -23,6 +24,9 @@ public class UNickEventListener extends AbstractEventListener<UNickEvent> {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ServerService serverService;
 
     @Autowired
     private KLineService klineService;
@@ -46,7 +50,7 @@ public class UNickEventListener extends AbstractEventListener<UNickEvent> {
 
         // Add user
         IRCUser user = new IRCUser();
-        user.setSid(event.getSid());
+        user.setServer(serverService.findBySID(event.getSid()));
         user.setUid(event.getUid());
         user.setNick(event.getNick());
         user.setUser(event.getUser());
@@ -80,10 +84,10 @@ public class UNickEventListener extends AbstractEventListener<UNickEvent> {
 
                 if(kline != null) {
                     String message = String.format("Enforcing TKLine on %s for %s (%s@%s) matching %s: %s",
-                            user.getSid(), user.getNick(), user.getUser(), user.getHost(), kline.toHostmask(), kline.getReason());
+                            user.getServer().getName(), user.getNick(), user.getUser(), user.getHost(), kline.toHostmask(), kline.getReason());
                     LOGGER.info(message);
-                    ircConnectionService.notice(event.getIRCConnection(), properties.getChannel(), message);
-                    klineService.enforceKLine(kline, user.getSid());
+                    ircConnectionService.notice(event.getIRCConnection(), serviceChannel, message);
+                    klineService.enforceKLine(kline, user.getServer().getSid());
                 }
 
                 /*

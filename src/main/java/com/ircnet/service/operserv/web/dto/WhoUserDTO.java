@@ -10,6 +10,11 @@ public class WhoUserDTO {
   private String sid;
 
   /**
+   * Name of the server the user is connected to.
+   */
+  private String serverName;
+
+  /**
    * UID.
    */
   private String uid;

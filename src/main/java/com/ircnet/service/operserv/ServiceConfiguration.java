@@ -1,6 +1,8 @@
 package com.ircnet.service.operserv;
 
 import com.ircnet.library.service.IRCServiceTask;
+import com.ircnet.library.service.ServiceConfigurationModel;
+import com.ircnet.service.operserv.irc.IRCServer;
 import com.ircnet.service.operserv.irc.IRCUser;
 import com.ircnet.service.operserv.kline.KLine;
 import com.ircnet.service.operserv.squery.*;
@@ -89,6 +91,14 @@ public class ServiceConfiguration {
      */
     @Bean("userMapByNick")
     public Map<String, IRCUser> userMapByNick() {
+        return new ConcurrentHashMap<>();
+    }
+
+    /**
+     * A map containing all servers mapped by SID.
+     */
+    @Bean("serverMap")
+    public Map<String, IRCServer> serverMap() {
         return new ConcurrentHashMap<>();
     }
 

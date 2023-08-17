@@ -5,45 +5,45 @@ package com.ircnet.service.operserv.irc;
  */
 public interface UserService {
   /**
-   * Adds an user.
+   * Adds a user.
    *
-   * @param user
+   * @param user A user
    */
   void add(IRCUser user);
 
   /**
-   * Finds an user by UID.
+   * Finds a user by UID.
    *
-   * @return An user or null if the user could not be found
+   * @return A user or null if the user could not be found
    */
   IRCUser findByUID(String uid);
 
   /**
-   * Finds an user by nick.
+   * Finds a user by nick.
    *
-   * @return An user or null if the user could not be found
+   * @return A user or null if the user could not be found
    */
   IRCUser findByNick(String nick);
 
   /**
    * Finds an IRC user by uid or by nick.
    *
-   * @return An user or null if the user could not be found
+   * @return A user or null if the user could not be found
    */
   IRCUser findByUIDorNick(String arg);
 
   /**
-   * Renames an user.
+   * Renames a user.
    *
-   * @param user User object
+   * @param user A user
    * @param newNick The new nick
    */
   void rename(IRCUser user, String newNick);
 
   /**
-   * Removes an user.
+   * Removes a user.
    *
-   * @param user User object
+   * @param user A user
    */
   void remove(IRCUser user);
 }
