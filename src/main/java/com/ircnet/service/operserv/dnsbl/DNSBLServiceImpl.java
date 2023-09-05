@@ -57,6 +57,7 @@ public class DNSBLServiceImpl implements DNSBLervice {
   @Override
   public void check(IRCUser user) {
     // If we are here, no K-Line exists currently.
+    // TODO: ehcache
     DNSBLResult entry = resultMap.get(user.getIpAddress());
 
     if (entry != null && entry.getStatus() == DNSBLStatus.NOT_LISTED) {
@@ -162,8 +163,6 @@ public class DNSBLServiceImpl implements DNSBLervice {
                         LOGGER.info("{} is listed in {} ({})", request.getIpAddress(), provider.getName(), StringUtils.join(aRecords, ", "));
                         // Add K-Line
                         createKLine(request, provider, aRecords);
-                        // Add to cache
-                        resultMap.put(request.getIpAddress(), new DNSBLResult(DNSBLStatus.LISTED));
                         // Stop searching for more matches
                         isListed.set(true);
                         iterator.remove();
@@ -174,8 +173,6 @@ public class DNSBLServiceImpl implements DNSBLervice {
                     if (aRecords.isEmpty() || ex.getCause() instanceof NoSuchDomainException || (answers != null && CollectionUtils.isEmpty(answers.getRecords()))) {
                       // NXDOMAIN or at least no (relevant) A record: not DNSBL listed
                       LOGGER.debug("{} is not listed in {}", request.getIpAddress(), provider.getName());
-                      // Add to cache
-                      resultMap.put(request.getIpAddress(), new DNSBLResult(DNSBLStatus.NOT_LISTED));
                       // Continue with next DNSBL provider
                       iterator.remove();
                     }
@@ -216,6 +213,14 @@ public class DNSBLServiceImpl implements DNSBLervice {
     }
 
     LOGGER.debug("Finished DNSBL lookup for {} (user: {}!{}@{})", request.getIpAddress(), request.getUser().getNick(), request.getUser().getUser(), request.getUser().getHost());
+
+    // Add to cache
+    if(isListed.get()) {
+      resultMap.put(request.getIpAddress(), new DNSBLResult(DNSBLStatus.LISTED));
+    }
+    else {
+      resultMap.put(request.getIpAddress(), new DNSBLResult(DNSBLStatus.NOT_LISTED));
+    }
   }
 
   private void createKLine(DNSBLRequest request, DNSBLProvider provider, List<String> aRecords) {
