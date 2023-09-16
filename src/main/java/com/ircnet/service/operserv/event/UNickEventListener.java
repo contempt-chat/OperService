@@ -86,7 +86,7 @@ public class UNickEventListener extends AbstractEventListener<UNickEvent> {
                     String message = String.format("Enforcing TKLine on %s for %s (%s@%s) matching %s: %s",
                             user.getServer().getName(), user.getNick(), user.getUser(), user.getHost(), kline.toHostmask(), kline.getReason());
                     LOGGER.info(message);
-                    ircConnectionService.notice(event.getIRCConnection(), serviceChannel, message);
+                    ircConnectionService.notice(event.getIRCConnection(), properties.getChannel(), message);
                     klineService.enforceKLine(kline, user.getServer().getSid());
                 }
 
