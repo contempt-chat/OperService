@@ -14,17 +14,21 @@ public class KLineDTO {
   private Long duration;
   private String sid;
   private String requestedBy;
+  private boolean saslException;
+  private boolean identException;
 
   @Override
   public String toString() {
     return "KLineDTO{" +
-        "id=" + id +
-        ", username='" + username + '\'' +
-        ", hostname='" + hostname + '\'' +
-        ", reason='" + reason + '\'' +
-        ", duration=" + duration +
-        ", sid='" + sid + '\'' +
-        ", requestedBy='" + requestedBy + '\'' +
-        '}';
+            "id=" + id +
+            ", username='" + username + '\'' +
+            ", hostname='" + hostname + '\'' +
+            ", reason='" + reason + '\'' +
+            ", duration=" + duration +
+            ", sid='" + sid + '\'' +
+            ", requestedBy='" + requestedBy + '\'' +
+            ", saslException=" + saslException +
+            ", identException=" + identException +
+            '}';
   }
 }

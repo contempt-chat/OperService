@@ -133,12 +133,18 @@ public class KLineServiceImpl implements KLineService {
         if (kline.getExpirationDate() != null) {
             long timeDiff = (kline.getExpirationDate().getTime() - System.currentTimeMillis()) / 1000L;
             // TODO: convert back to wdhms to avoid overflows
-            ircConnectionService.send(ircServiceTask.getIRCConnection(), "ENCAP %s TKLINE %ss %s :%s", sid, timeDiff, kline.toHostmask(), kline.getReason());
+            if(sid.equals("380D"))
+                ircConnectionService.send(ircServiceTask.getIRCConnection(), "ENCAP %s TKLINE %ss%%%s %s :%s", sid, timeDiff, kline.createFlags(), kline.toHostmask(), kline.getReason());
+            else
+                ircConnectionService.send(ircServiceTask.getIRCConnection(), "ENCAP %s TKLINE %ss %s :%s", sid, timeDiff, kline.toHostmask(), kline.getReason());
         }
         else {
             // No expiration time configured. Add a TKLINE for 1 week. The ban resists in OperServ and will be enforced again
             // if the user returns later.
-            ircConnectionService.send(ircServiceTask.getIRCConnection(), "ENCAP %s TKLINE 1w %s :%s", sid, kline.toHostmask(), kline.getReason());
+            if(sid.equals("380D"))
+                ircConnectionService.send(ircServiceTask.getIRCConnection(), "ENCAP %s TKLINE 1w%%%s %s :%s", sid, kline.createFlags(), kline.toHostmask(), kline.getReason());
+            else
+                ircConnectionService.send(ircServiceTask.getIRCConnection(), "ENCAP %s TKLINE 1w %s :%s", sid, kline.toHostmask(), kline.getReason());
         }
 
     }
@@ -170,7 +176,8 @@ public class KLineServiceImpl implements KLineService {
             return false;
         }
 
-        return matchService.isMatching(user, kline.getUsername(), kline.getHostname(), kline.isIpAddressOrRange(), kline.getSid());
+        return matchService.isMatching(user, kline.getUsername(), kline.getHostname(), kline.isIpAddressOrRange(),
+                kline.getSid(), kline.isSaslException(), kline.isIdentException());
     }
 
     @Override

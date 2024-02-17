@@ -31,6 +31,9 @@ public class KLineMapper {
       kline.setExpirationDate(new Date(System.currentTimeMillis() + klineDTO.getDuration() * 1000L));
     }
 
+    kline.setSaslException(klineDTO.isSaslException());
+    kline.setIdentException(klineDTO.isIdentException());
+
     return kline;
   }
 }

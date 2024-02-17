@@ -16,9 +16,11 @@ public interface MatchService {
      * @param hostname hostname pattern (wildcards or CIDR notation)
      * @param isIpAddressOrRange true if the hostname is an IP address or range
      * @param sid SID pattern
+     * @param saslException Do not match users that are authenticated via SASL
+     * @param identException Do not match users that have ident
      * @return true if the user matches the given parameters
      */
-    boolean isMatching(IRCUser user, String username, String hostname, boolean isIpAddressOrRange, String sid);
+    boolean isMatching(IRCUser user, String username, String hostname, boolean isIpAddressOrRange, String sid, boolean saslException, boolean identException);
 
     /**
      * Finds users that are connected to IRC that match the given parameters.

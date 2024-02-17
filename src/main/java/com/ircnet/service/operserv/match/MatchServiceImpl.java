@@ -19,7 +19,18 @@ public class MatchServiceImpl implements MatchService {
     private Map<String, IRCUser> userMapByUID;
 
     @Override
-    public boolean isMatching(IRCUser user, String username, String hostname, boolean isIpAddressOrRange, String sid) {
+    public boolean isMatching(IRCUser user, String username, String hostname, boolean isIpAddressOrRange, String sid,
+                              boolean saslException, boolean identException) {
+        // Check SASL
+        if(saslException && user.getAccount() != null) {
+            return false;
+        }
+
+        // Check ident
+        if(identException && user.getUser().charAt(0) != '~' && user.getUser().charAt(0) != '-') {
+            return false;
+        }
+
         // Check SID
         if(StringUtils.isNotEmpty(sid) && !Util.matches(user.getServer().getSid(), sid)) {
             return false;
@@ -76,7 +87,7 @@ public class MatchServiceImpl implements MatchService {
                 }
             }
 
-            if(isMatching(user, username, hostname, isIpAddressOrRange, sid)) {
+            if(isMatching(user, username, hostname, isIpAddressOrRange, sid, false, false)) {
                 matchingUsers.add(user);
             }
         }

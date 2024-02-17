@@ -66,6 +66,16 @@ public class KLine {
    */
   private KLineType type;
 
+  /**
+   * K-Line matches only users that are not authenticated via SASL.
+   */
+  private boolean saslException;
+
+  /**
+   * K-Line matches only users that have no ident.
+   */
+  private boolean identException;
+
   @Override
   public String toString() {
     return "KLine{" +
@@ -86,6 +96,24 @@ public class KLine {
    */
   public String toHostmask() {
     return String.format("%s@%s", getUsername(), getHostname());
+  }
+
+  /**
+   * Creates (T)K-Line flags.
+   *
+   * @return (T)K-Line flags
+   */
+  public String createFlags() {
+    StringBuilder flags = new StringBuilder();
+
+    if(saslException) {
+      flags.append('S');
+    }
+    if(identException) {
+      flags.append('I');
+    }
+
+    return flags.toString();
   }
 
   @Override
