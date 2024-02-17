@@ -66,7 +66,16 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public void remove(IRCUser user) {
-    userMapByUID.remove(user.getUid());
-    userMapByNick.remove(user.getNick());
+    IRCUser userInMap;
+
+    userInMap = userMapByUID.remove(user.getUid());
+    if(userInMap == null) {
+      LOGGER.error("userMapByUID.remove(\"{}\") failed", user.getUid());
+    }
+
+    userInMap = userMapByNick.remove(user.getNick());
+    if(userInMap == null) {
+      LOGGER.error("userMapByNick.remove(\"{}\") failed", user.getNick());
+    }
   }
 }

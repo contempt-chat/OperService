@@ -34,6 +34,9 @@ public class QuitEventListener extends AbstractEventListener<QuitEvent> {
 
             userService.remove(user);
         }
+        else {
+            LOGGER.error("Could not find user '{}'", event.getUid());
+        }
     }
 }
 
