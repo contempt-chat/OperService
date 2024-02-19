@@ -9,18 +9,19 @@ import java.util.List;
  */
 public interface MatchService {
     /**
-     * Checks if an user matches the given parameters.
+     * Checks if a user matches the given parameters.
      *
-     * @param user An user that is connected to IRC
+     * @param user A user that is connected to IRC
      * @param username username or ident pattern
      * @param hostname hostname pattern (wildcards or CIDR notation)
      * @param isIpAddressOrRange true if the hostname is an IP address or range
      * @param sid SID pattern
-     * @param saslException Do not match users that are authenticated via SASL
-     * @param identException Do not match users that have ident
+     * @param excludeSASL Do not match users that are authenticated via SASL
+     * @param excludeUsersWithIdent Do not match users that have ident
      * @return true if the user matches the given parameters
      */
-    boolean isMatching(IRCUser user, String username, String hostname, boolean isIpAddressOrRange, String sid, boolean saslException, boolean identException);
+    boolean isMatching(IRCUser user, String username, String hostname, boolean isIpAddressOrRange, String sid,
+                       boolean excludeSASL, boolean excludeUsersWithIdent);
 
     /**
      * Finds users that are connected to IRC that match the given parameters.
@@ -30,7 +31,8 @@ public interface MatchService {
      * @param isIpAddressOrRange true if the hostname is an IP address or range
      * @param sid SID pattern
      * @param account Account name or null to match anything
+     * @param excludeUsersWithIdent Do not match users that have ident
      * @return A list of users that are connected to IRC
      */
-    List<IRCUser> findMatching(String username, String hostname, boolean isIpAddressOrRange, String sid, String account);
+    List<IRCUser> findMatching(String username, String hostname, boolean isIpAddressOrRange, String sid, String account, boolean excludeUsersWithIdent);
 }

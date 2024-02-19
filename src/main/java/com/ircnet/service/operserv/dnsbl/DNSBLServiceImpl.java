@@ -147,7 +147,7 @@ public class DNSBLServiceImpl implements DNSBLervice {
 
                     if (ex == null && !answers.getRecords().isEmpty()) {
                       // Collect A records
-                      for (Record record : answers.getRecords()) {
+                      for (org.xbill.DNS.Record record : answers.getRecords()) {
                         if (!(record instanceof ARecord)) {
                           continue;
                         }
