@@ -31,7 +31,7 @@ public class ApiController {
 
   @RequestMapping(value = "/k-line", method = RequestMethod.POST)
   public ResponseEntity<Object> addKLine(@RequestBody KLineDTO klineDTO) {
-    LOGGER.debug("Received {}", klineDTO);
+    LOGGER.debug("Received K-Line: {}", klineDTO);
     KLine kline = KLineMapper.map(klineDTO);
     klineService.create(null, kline, klineDTO.getDuration());
 
@@ -66,6 +66,7 @@ public class ApiController {
 
   @RequestMapping(value = "/who", method = RequestMethod.POST)
   public ResponseEntity<WhoReplyDTO> who(@RequestBody WhoDTO whoDTO) {
+    LOGGER.debug("Received WHO: {}", whoDTO);
     boolean isIpAddressOrRange = Util.isIpAddressOrRange(whoDTO.getHostname());
     List<IRCUser> matchingUsers = matchService.findMatching(whoDTO.getUsername(), whoDTO.getHostname(),
         isIpAddressOrRange, whoDTO.getSid(), whoDTO.getAccount(), whoDTO.isExcludeUsersWithIdent());
