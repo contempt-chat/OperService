@@ -20,14 +20,14 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public boolean isMatching(IRCUser user, String username, String hostname, boolean isIpAddressOrRange, String sid,
-                              boolean excludeSASL, boolean excludeUsersWithIdent) {
+                              boolean excludeSASL, boolean excludeIdent) {
         // Check SASL
         if(excludeSASL && user.getAccount() != null) {
             return false;
         }
 
         // Check ident
-        if(excludeUsersWithIdent && user.getUser().charAt(0) != '~' && user.getUser().charAt(0) != '-') {
+        if(excludeIdent && user.getUser().charAt(0) != '~' && user.getUser().charAt(0) != '-') {
             return false;
         }
 
@@ -67,12 +67,17 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public List<IRCUser> findMatching(String username, String hostname, boolean isIpAddressOrRange, String sid,
-                                      String accountName, boolean excludeUsersWithIdent) {
+                                      String accountName, boolean excludeSASL, boolean excludeIdent) {
         List<IRCUser> matchingUsers = new ArrayList<>();
 
         for (IRCUser user : userMapByUID.values()) {
+            // Check SASL
+            if(excludeSASL && user.getAccount() != null) {
+                continue;
+            }
+            
             // Check ident
-            if(excludeUsersWithIdent && user.getUser().charAt(0) != '~' && user.getUser().charAt(0) != '-') {
+            if(excludeIdent && user.getUser().charAt(0) != '~' && user.getUser().charAt(0) != '-') {
                 continue;
             }
 

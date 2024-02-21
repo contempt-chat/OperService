@@ -17,11 +17,11 @@ public interface MatchService {
      * @param isIpAddressOrRange true if the hostname is an IP address or range
      * @param sid SID pattern
      * @param excludeSASL Do not match users that are authenticated via SASL
-     * @param excludeUsersWithIdent Do not match users that have ident
+     * @param excludeIdent Do not match users that have ident
      * @return true if the user matches the given parameters
      */
     boolean isMatching(IRCUser user, String username, String hostname, boolean isIpAddressOrRange, String sid,
-                       boolean excludeSASL, boolean excludeUsersWithIdent);
+                       boolean excludeSASL, boolean excludeIdent);
 
     /**
      * Finds users that are connected to IRC that match the given parameters.
@@ -31,8 +31,9 @@ public interface MatchService {
      * @param isIpAddressOrRange true if the hostname is an IP address or range
      * @param sid SID pattern
      * @param account Account name or null to match anything
-     * @param excludeUsersWithIdent Do not match users that have ident
+     * @param excludeSASL Do not match users that are authenticated via SASL
+     * @param excludeIdent Do not match users that have ident
      * @return A list of users that are connected to IRC
      */
-    List<IRCUser> findMatching(String username, String hostname, boolean isIpAddressOrRange, String sid, String account, boolean excludeUsersWithIdent);
+    List<IRCUser> findMatching(String username, String hostname, boolean isIpAddressOrRange, String sid, String account, boolean excludeSASL, boolean excludeIdent);
 }

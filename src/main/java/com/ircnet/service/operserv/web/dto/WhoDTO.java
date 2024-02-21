@@ -8,7 +8,8 @@ public class WhoDTO {
   private String hostname;
   private String sid;
   private String account;
-  private boolean excludeUsersWithIdent;
+  private boolean excludeUsersWithSASL;
+  private boolean excludeIdent;
 
   @Override
   public String toString() {
@@ -17,7 +18,8 @@ public class WhoDTO {
         ", hostname='" + hostname + '\'' +
         ", sid='" + sid + '\'' +
         ", account='" + account + '\'' +
-        ", excludeUsersWithIdent=" + excludeUsersWithIdent +
+        ", excludeUsersWithSASL=" + excludeUsersWithSASL +
+        ", excludeIdent=" + excludeIdent +
         '}';
   }
 }

@@ -69,7 +69,8 @@ public class ApiController {
     LOGGER.debug("Received WHO: {}", whoDTO);
     boolean isIpAddressOrRange = Util.isIpAddressOrRange(whoDTO.getHostname());
     List<IRCUser> matchingUsers = matchService.findMatching(whoDTO.getUsername(), whoDTO.getHostname(),
-        isIpAddressOrRange, whoDTO.getSid(), whoDTO.getAccount(), whoDTO.isExcludeUsersWithIdent());
+        isIpAddressOrRange, whoDTO.getSid(), whoDTO.getAccount(), whoDTO.isExcludeUsersWithSASL(),
+        whoDTO.isExcludeIdent());
     List<WhoUserDTO> whoUserDTOs = matchingUsers.stream().map(e -> mapIRCUser(e)).collect(Collectors.toList());
     WhoReplyDTO whoReplyDTO = new WhoReplyDTO();
     whoReplyDTO.setUsers(whoUserDTOs);
