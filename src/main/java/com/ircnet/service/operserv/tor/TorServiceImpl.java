@@ -65,6 +65,8 @@ public class TorServiceImpl implements TorService {
                     kline.setHostname(ip);
                     kline.setIpAddressOrRange(true);
                     kline.setReason("Tor Exit Node");
+                    kline.setIdentException(true);
+                    kline.setSaslException(true);
                     newKLines.add(kline);
                 }
 
