@@ -189,16 +189,6 @@ public class KLineServiceImpl implements KLineService {
         return Collections.unmodifiableList(filteredKLineList);
     }
 
-/*    @Override
-    public List<KLine> findAllWithTypes(KLineType... types) {
-        Date now = new Date();
-        List<KLineType> typeList = Arrays.asList(types);
-        List<KLine> filteredKLineList = klineList.stream()
-            .filter(e -> typeList.contains(e.getType()))
-            .filter(e -> e.getExpirationDate() == null || e.getExpirationDate().after(now))
-            .collect(Collectors.toList());
-        return Collections.unmodifiableList(filteredKLineList);
-    }*/
 
     @Override
     public boolean hasAnyWithType(KLineType type) {

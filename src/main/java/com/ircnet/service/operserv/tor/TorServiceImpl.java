@@ -44,21 +44,15 @@ public class TorServiceImpl implements TorService {
 
     @Override
     public void loadFromWeb() {
-        Mono url1 = receiveIpList("https://lists.fissionrelays.net/tor/exits.txt");
-        Mono url2 = receiveIpList("https://www.dan.me.uk/torlist/?exit");
+        Mono url1 = receiveIpList("https://www.dan.me.uk/torlist/?exit");
 
-        Mono.zip(url1, url2, (ipList1, ipList2) -> {
-            Set<String> ipList = new HashSet<>();
-            ipList.addAll((Collection<? extends String>) ipList1);
-            ipList.addAll((Collection<? extends String>) ipList2);
-            return ipList;
-        }).subscribe(ipList -> {
-            Set<String> ipSet = (Set<String>) ipList;
+        url1.subscribe(ipList -> {
+            Collection<String> ipCollection = (Collection<String>) ipList;
 
-            if (!ipSet.isEmpty()) {
+            if (!ipCollection.isEmpty()) {
                 List<KLine> newKLines = new ArrayList<>();
 
-                for (String ip : ipSet) {
+                for (String ip : ipCollection) {
                     KLine kline = new KLine();
                     kline.setType(KLineType.TOR);
                     kline.setUsername("*");
@@ -71,13 +65,13 @@ public class TorServiceImpl implements TorService {
                 klineService.removeAllWithType(KLineType.TOR);
                 klineList.addAll(newKLines);
 
-                String message = String.format("Loaded %d Tor Exit Nodes", ipSet.size());
+                String message = String.format("Loaded %d Tor Exit Nodes", ipCollection.size());
                 LOGGER.info(message);
 
                 persistenceService.save();
 
                 if (ircServiceTask.getIRCConnection().getConnectionStatus() == ConnectionStatus.REGISTERED) {
-                    ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
+                    //ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
 
                     ScannerThread.getInstance().runOnThread(new Runnable() {
                         @Override
