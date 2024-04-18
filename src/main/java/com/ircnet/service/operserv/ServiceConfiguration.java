@@ -1,10 +1,6 @@
 package com.ircnet.service.operserv;
 
 import com.ircnet.library.service.IRCServiceTask;
-import com.ircnet.library.service.ServiceConfigurationModel;
-import com.ircnet.service.operserv.irc.IRCServer;
-import com.ircnet.service.operserv.irc.IRCUser;
-import com.ircnet.service.operserv.kline.KLine;
 import com.ircnet.service.operserv.squery.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -15,10 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Spring configuration.
@@ -76,38 +69,6 @@ public class ServiceConfiguration {
 
     private void addCommand(Map<String, SQueryCommand> commandMap, SQueryCommand squeryCommand) {
         commandMap.put(squeryCommand.getCommandName(), squeryCommand);
-    }
-
-    /**
-     * A map containing all irc users mapped by UID.
-     */
-    @Bean("userMapByUID")
-    public Map<String, IRCUser> userMapByUID() {
-        return new ConcurrentHashMap<>();
-    }
-
-    /**
-     * A map containing all IRC users mapped by nick.
-     */
-    @Bean("userMapByNick")
-    public Map<String, IRCUser> userMapByNick() {
-        return new ConcurrentHashMap<>();
-    }
-
-    /**
-     * A map containing all servers mapped by SID.
-     */
-    @Bean("serverMap")
-    public Map<String, IRCServer> serverMap() {
-        return new ConcurrentHashMap<>();
-    }
-
-    /**
-     * List of K-Lines.
-     */
-    @Bean("klineList")
-    public List<KLine> klineList() {
-        return new CopyOnWriteArrayList();
     }
 
     /**

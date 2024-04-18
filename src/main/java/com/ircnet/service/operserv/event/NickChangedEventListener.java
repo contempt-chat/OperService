@@ -2,8 +2,8 @@ package com.ircnet.service.operserv.event;
 
 import com.ircnet.library.common.event.AbstractEventListener;
 import com.ircnet.library.service.event.NickChangeEvent;
+import com.ircnet.library.service.user.IRCUser;
 import com.ircnet.service.operserv.ServiceProperties;
-import com.ircnet.service.operserv.irc.IRCUser;
 import com.ircnet.service.operserv.irc.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

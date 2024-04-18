@@ -2,7 +2,7 @@ package com.ircnet.service.operserv.event;
 
 import com.ircnet.library.common.event.AbstractEventListener;
 import com.ircnet.library.service.event.ServerEvent;
-import com.ircnet.service.operserv.irc.IRCServer;
+import com.ircnet.library.service.server.IRCServer;
 import com.ircnet.service.operserv.irc.ServerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,16 +1,21 @@
 package com.ircnet.service.operserv.irc;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.ircnet.library.service.server.IRCServer;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class ServerServiceImpl implements ServerService {
-    @Autowired
-    @Qualifier("serverMap")
-    private Map<String, IRCServer> serverMap;
+    /**
+     * A map containing all servers mapped by SID.
+     */
+    protected final Map<String, IRCServer> serverMap;
+
+    public ServerServiceImpl() {
+        this.serverMap = new ConcurrentHashMap<>();
+    }
 
     @Override
     public void add(IRCServer server) {

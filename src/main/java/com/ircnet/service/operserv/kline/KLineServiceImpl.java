@@ -4,34 +4,32 @@ import com.ircnet.library.common.User;
 import com.ircnet.library.common.connection.ConnectionStatus;
 import com.ircnet.library.common.connection.IRCConnectionService;
 import com.ircnet.library.service.IRCServiceTask;
+import com.ircnet.library.service.user.IRCUser;
 import com.ircnet.service.operserv.ScannerThread;
 import com.ircnet.service.operserv.ServiceProperties;
 import com.ircnet.service.operserv.Util;
-import com.ircnet.service.operserv.irc.IRCUser;
+import com.ircnet.service.operserv.irc.UserService;
 import com.ircnet.service.operserv.match.MatchService;
 import com.ircnet.service.operserv.persistence.PersistenceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 @Service
 public class KLineServiceImpl implements KLineService {
     private static final Logger LOGGER = LoggerFactory.getLogger(KLineServiceImpl.class);
 
-    @Autowired
-    @Qualifier("klineList")
-    private List<KLine> klineList;
-
-    @Autowired
-    @Qualifier("userMapByUID")
-    private Map<String, IRCUser> userMapByUID;
+    /**
+     * List of K-Lines.
+     */
+    private final List<KLine> klineList;
 
     @Autowired
     private MatchService matchService;
@@ -43,10 +41,17 @@ public class KLineServiceImpl implements KLineService {
     private IRCConnectionService ircConnectionService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private IRCServiceTask ircServiceTask;
 
     @Autowired
     private ServiceProperties properties;
+
+    public KLineServiceImpl() {
+        this.klineList = new CopyOnWriteArrayList();
+    }
 
     @Override
     public void create(User from, KLine kline, Long originalDuration) {
@@ -207,7 +212,7 @@ public class KLineServiceImpl implements KLineService {
     private List<IRCUser> isMatchingAnyUser(KLine kline) {
         List<IRCUser> matchingUsers = new ArrayList<>();
 
-        for (IRCUser user : userMapByUID.values()) {
+        for (IRCUser user : userService.getAllUsers()) {
             if (matchKLine(kline, user)) {
                 matchingUsers.add(user);
             }
@@ -327,5 +332,16 @@ public class KLineServiceImpl implements KLineService {
             .filter(e -> e.getType() == KLineType.WEB)
             .map(e -> e.getId())
             .collect(Collectors.summingLong(Long::longValue));
+    }
+
+    @Override
+    public List<KLine> getKlineList() {
+        return Collections.unmodifiableList(klineList);
+    }
+
+    @Override
+    public void replaceKlineList(List<KLine> klines) {
+        klineList.clear();
+        klineList.addAll(klines);
     }
 }

@@ -1,6 +1,6 @@
 package com.ircnet.service.operserv.dnsbl;
 
-import com.ircnet.service.operserv.irc.IRCUser;
+import com.ircnet.library.service.user.IRCUser;
 
 public interface DNSBLervice {
   /**

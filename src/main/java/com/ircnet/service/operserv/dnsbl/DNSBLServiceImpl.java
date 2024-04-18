@@ -1,7 +1,7 @@
 package com.ircnet.service.operserv.dnsbl;
 
-import com.ircnet.service.operserv.IpAddressFamily;
-import com.ircnet.service.operserv.irc.IRCUser;
+import com.ircnet.library.service.user.IRCUser;
+import com.ircnet.library.service.user.IpAddressFamily;
 import com.ircnet.service.operserv.kline.KLine;
 import com.ircnet.service.operserv.kline.KLineService;
 import com.ircnet.service.operserv.kline.KLineType;

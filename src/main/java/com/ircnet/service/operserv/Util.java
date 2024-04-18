@@ -1,5 +1,6 @@
 package com.ircnet.service.operserv;
 
+import com.ircnet.library.service.user.IpAddressFamily;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.validator.routines.InetAddressValidator;

@@ -1,22 +1,20 @@
 package com.ircnet.service.operserv.match;
 
+import com.ircnet.library.service.user.IRCUser;
 import com.ircnet.service.operserv.Util;
-import com.ircnet.service.operserv.irc.IRCUser;
+import com.ircnet.service.operserv.irc.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.web.util.matcher.IpAddressMatcher;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class MatchServiceImpl implements MatchService {
     @Autowired
-    @Qualifier("userMapByUID")
-    private Map<String, IRCUser> userMapByUID;
+    private UserService userService;
 
     @Override
     public boolean isMatching(IRCUser user, String username, String hostname, boolean isIpAddressOrRange, String sid,
@@ -70,7 +68,7 @@ public class MatchServiceImpl implements MatchService {
                                       String accountName, boolean excludeSASL, boolean excludeIdent) {
         List<IRCUser> matchingUsers = new ArrayList<>();
 
-        for (IRCUser user : userMapByUID.values()) {
+        for (IRCUser user : userService.getAllUsers()) {
             // Check SASL
             if(excludeSASL && user.getAccount() != null) {
                 continue;

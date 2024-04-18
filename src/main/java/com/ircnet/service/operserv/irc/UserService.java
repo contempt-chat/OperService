@@ -1,5 +1,9 @@
 package com.ircnet.service.operserv.irc;
 
+import com.ircnet.library.service.user.IRCUser;
+
+import java.util.Collection;
+
 /**
  * Services for managing users that are connected to IRC.
  */
@@ -46,4 +50,11 @@ public interface UserService {
    * @param user A user
    */
   void remove(IRCUser user);
+
+  /**
+   * Returns all users.
+   *
+   * @return All users
+   */
+  Collection<IRCUser> getAllUsers();
 }

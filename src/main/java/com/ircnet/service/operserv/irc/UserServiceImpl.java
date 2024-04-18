@@ -1,24 +1,32 @@
 package com.ircnet.service.operserv.irc;
 
+import com.ircnet.library.service.user.IRCUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class UserServiceImpl implements UserService {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
-  @Autowired
-  @Qualifier("userMapByUID")
-  private Map<String, IRCUser>  userMapByUID;
+  /**
+   * A map containing all irc users mapped by UID.
+   */
+  protected final Map<String, IRCUser> userMapByUID;
 
-  @Autowired
-  @Qualifier("userMapByNick")
-  private Map<String, IRCUser> userMapByNick;
+  /**
+   * A map containing all IRC users mapped by nick.
+   */
+  protected final Map<String, IRCUser> userMapByNick;
+
+  public UserServiceImpl() {
+    this.userMapByUID = new ConcurrentHashMap<>();
+    this.userMapByNick = new ConcurrentHashMap<>();
+  }
 
   @Override
   public void add(IRCUser user) {
@@ -77,5 +85,10 @@ public class UserServiceImpl implements UserService {
     if(userInMap == null) {
       LOGGER.error("userMapByNick.remove(\"{}\") failed", user.getNick());
     }
+  }
+
+  @Override
+  public Collection<IRCUser> getAllUsers() {
+    return userMapByUID.values();
   }
 }

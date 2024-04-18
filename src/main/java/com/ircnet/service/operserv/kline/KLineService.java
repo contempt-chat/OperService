@@ -1,7 +1,7 @@
 package com.ircnet.service.operserv.kline;
 
 import com.ircnet.library.common.User;
-import com.ircnet.service.operserv.irc.IRCUser;
+import com.ircnet.library.service.user.IRCUser;
 
 import java.util.List;
 
@@ -138,4 +138,16 @@ public interface KLineService {
    * @return
    */
   long createCheckSum();
+
+  /**
+   * Returns an unmodifiable list of K-Lines.
+   * @return An unmodifiable list of K-Lines.
+   */
+  List<KLine> getKlineList();
+
+  /**
+   * Replaces the stored list of K-Lines by a new list.
+   * @param klines A list of K-Lines
+   */
+  void replaceKlineList(List<KLine> klines);
 }

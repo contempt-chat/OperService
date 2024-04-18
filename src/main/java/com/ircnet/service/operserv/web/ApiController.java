@@ -1,7 +1,7 @@
 package com.ircnet.service.operserv.web;
 
+import com.ircnet.library.service.user.IRCUser;
 import com.ircnet.service.operserv.Util;
-import com.ircnet.service.operserv.irc.IRCUser;
 import com.ircnet.service.operserv.kline.KLine;
 import com.ircnet.service.operserv.kline.KLineDTO;
 import com.ircnet.service.operserv.kline.KLineMapper;
@@ -69,7 +69,7 @@ public class ApiController {
     LOGGER.debug("Received WHO: {}", whoDTO);
     boolean isIpAddressOrRange = Util.isIpAddressOrRange(whoDTO.getHostname());
     List<IRCUser> matchingUsers = matchService.findMatching(whoDTO.getUsername(), whoDTO.getHostname(),
-        isIpAddressOrRange, whoDTO.getSid(), whoDTO.getAccount(), whoDTO.isExcludeUsersWithSASL(),
+        isIpAddressOrRange, whoDTO.getSid(), whoDTO.getAccount(), whoDTO.isExcludeSASL(),
         whoDTO.isExcludeIdent());
     List<WhoUserDTO> whoUserDTOs = matchingUsers.stream().map(e -> mapIRCUser(e)).collect(Collectors.toList());
     WhoReplyDTO whoReplyDTO = new WhoReplyDTO();

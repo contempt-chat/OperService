@@ -1,5 +1,7 @@
 package com.ircnet.service.operserv.irc;
 
+import com.ircnet.library.service.server.IRCServer;
+
 public interface ServerService {
     /**
      * Adds a server.

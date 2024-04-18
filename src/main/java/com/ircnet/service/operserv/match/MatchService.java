@@ -1,6 +1,6 @@
 package com.ircnet.service.operserv.match;
 
-import com.ircnet.service.operserv.irc.IRCUser;
+import com.ircnet.library.service.user.IRCUser;
 
 import java.util.List;
 

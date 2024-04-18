@@ -7,7 +7,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
@@ -25,10 +24,6 @@ public class PersistenceServiceImpl implements PersistenceService {
   private static final Logger LOGGER = LoggerFactory.getLogger(PersistenceServiceImpl.class);
 
   private boolean savePending;
-
-  @Autowired
-  @Qualifier("klineList")
-  private List<KLine> klineList;
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -61,7 +56,7 @@ public class PersistenceServiceImpl implements PersistenceService {
     try {
       List<KLine> klinesToSave = klineService.findAllNotExpired();
       PersistedData dataToSave = new PersistedData();
-      dataToSave.setKlineList(klineList);
+      dataToSave.setKlineList(klineService.getKlineList());
       objectMapper.writeValue(file, dataToSave);
       LOGGER.debug("Saved {} K-Lines", klinesToSave.size(), KLINE_FILE_NAME);
     }
@@ -80,8 +75,7 @@ public class PersistenceServiceImpl implements PersistenceService {
       List<KLine> klinesFromFile = data.getKlineList() != null ? data.getKlineList() : new ArrayList<>();
 
       if(CollectionUtils.isNotEmpty(klinesFromFile)) {
-        klineList.clear();
-        klineList.addAll(klinesFromFile);
+        klineService.replaceKlineList(klinesFromFile);
       }
 
       LOGGER.info("Loaded {} K-Lines from {}", klinesFromFile.size(), KLINE_FILE_NAME);
