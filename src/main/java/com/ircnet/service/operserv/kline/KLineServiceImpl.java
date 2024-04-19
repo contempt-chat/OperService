@@ -141,9 +141,8 @@ public class KLineServiceImpl implements KLineService {
             ircConnectionService.send(ircServiceTask.getIRCConnection(), "ENCAP %s TKLINE %ss%%%s %s :%s", sid, timeDiff, kline.createFlags(), kline.toHostmask(), kline.getReason());
         }
         else {
-            // No expiration time configured. Add a TKLINE for 1 week. The ban resists in OperServ and will be enforced again
-            // if the user returns later.
-            ircConnectionService.send(ircServiceTask.getIRCConnection(), "ENCAP %s TKLINE 1w%%%s %s :%s", sid, kline.createFlags(), kline.toHostmask(), kline.getReason());
+            // No expiration time configured
+            ircConnectionService.send(ircServiceTask.getIRCConnection(), "ENCAP %s TKLINE 365d%%%s %s :%s", sid, kline.createFlags(), kline.toHostmask(), kline.getReason());
         }
 
     }
