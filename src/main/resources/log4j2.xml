@@ -31,6 +31,10 @@
 
         <Logger name="com.ircnet" level="info"></Logger>
         <Logger name="com.ircnet.service.operserv" level="debug"></Logger>
+        <!--FIXME: remove-->
+        <Logger name="com.ircnet.service.operserv.irc.UserServiceImpl" level="trace"></Logger>
+        <Logger name="com.ircnet.service.operserv.event.QuitEventListener" level="trace"></Logger>
+        <Logger name="com.ircnet.service.operserv.event.UNickEventListener" level="trace"></Logger>
     </Loggers>
 
 </Configuration>

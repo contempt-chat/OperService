@@ -66,9 +66,11 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public void rename(IRCUser user, String newNick) {
+    String oldNick = user.getNick();
     userMapByNick.remove(user.getNick());
     user.setNick(newNick);
     userMapByNick.put(newNick, user);
+    LOGGER.trace("Changed nick of {} to {}", oldNick, user.getNick());
     // We do not have to touch userMapByUID because it is the same object
   }
 
@@ -80,10 +82,16 @@ public class UserServiceImpl implements UserService {
     if(userInMap == null) {
       LOGGER.error("userMapByUID.remove(\"{}\") failed", user.getUid());
     }
+    else {
+      LOGGER.trace("Removed {} from UID map", user.getUid());
+    }
 
     userInMap = userMapByNick.remove(user.getNick());
     if(userInMap == null) {
       LOGGER.error("userMapByNick.remove(\"{}\") failed", user.getNick());
+    }
+    else {
+      LOGGER.trace("Removed {} from nick map", user.getNick());
     }
   }
 

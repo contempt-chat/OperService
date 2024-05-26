@@ -26,17 +26,16 @@ public class QuitEventListener extends AbstractEventListener<QuitEvent> {
 
         IRCUser user = userService.findByUIDorNick(event.getUid());
 
-        if(user != null) {
-            if(!event.getIRCConnection().isBurst() && StringUtils.isNotBlank(properties.getClientsChannel())) {
-                ircConnectionService.notice(event.getIRCConnection(), properties.getClientsChannel(), "%s %s %s@%s QUIT message=%s",
-                    user.getUid(), user.getNick(), user.getUser(), user.getHost(), event.getMessage());
-            }
-
-            userService.remove(user);
-        }
-        else {
+        if(user == null) {
             LOGGER.error("Could not find user '{}'", event.getUid());
+            return;
         }
+
+        if(!event.getIRCConnection().isBurst() && StringUtils.isNotBlank(properties.getClientsChannel())) {
+            ircConnectionService.notice(event.getIRCConnection(), properties.getClientsChannel(), "%s %s %s@%s QUIT message=%s", user.getUid(), user.getNick(), user.getUser(), user.getHost(), event.getMessage());
+        }
+
+        userService.remove(user);
     }
 }
 

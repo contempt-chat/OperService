@@ -30,7 +30,6 @@ public class NickChangedEventListener extends AbstractEventListener<NickChangeEv
         IRCUser user = userService.findByUID(event.getUid());
         String oldNick = user.getNick();
         userService.rename(user, event.getNewNick());
-        LOGGER.trace("Changed nick of {} to {}", oldNick, user.getNick());
 
         if(!event.getIRCConnection().isBurst() && StringUtils.isNotBlank(properties.getClientsChannel())) {
             ircConnectionService.notice(event.getIRCConnection(), properties.getClientsChannel(), "%s %s %s@%s %s",
