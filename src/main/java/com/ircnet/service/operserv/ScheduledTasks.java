@@ -7,7 +7,6 @@ import com.ircnet.service.operserv.tor.TorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -29,10 +28,6 @@ public class ScheduledTasks {
     @Autowired
     protected IRCServiceTask ircServiceTask;
 
-    @Autowired
-    @Qualifier("klineList")
-    private List<KLine> klineList;
-
     /**
      * Downloads new lists of Tor exit nodes and creates K-Lines.
      */
@@ -43,21 +38,11 @@ public class ScheduledTasks {
 
     /**
      * Removes expired K-Lines.
-     *
      * This is just to free memory, expired K-Lines will not be enforced anymore even though they are still
      * stored.
      */
     @Scheduled(cron = "${kline.removeExpiredCron}")
     public void removedExpiredKLines() {
-        List<KLine> expiredKLines = klineService.findExpired();
-
-        if(expiredKLines.isEmpty()) {
-            return;
-        }
-
-        for (KLine kline : expiredKLines) {
-            klineList.remove(kline);
-            LOGGER.debug("Removed expired K-Line for {}", kline.toHostmask());
-        }
+        klineService.removedExpiredKLines();
     }
 }

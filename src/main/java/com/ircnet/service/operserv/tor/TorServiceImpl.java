@@ -12,7 +12,6 @@ import com.ircnet.service.operserv.persistence.PersistenceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -24,10 +23,6 @@ import java.util.List;
 @Service
 public class TorServiceImpl implements TorService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TorServiceImpl.class);
-
-    @Autowired
-    @Qualifier("klineList")
-    private List<KLine> klineList;
 
     @Autowired
     private KLineService klineService;
@@ -52,6 +47,7 @@ public class TorServiceImpl implements TorService {
             Collection<String> ipCollection = (Collection<String>) ipList;
 
             if (!ipCollection.isEmpty()) {
+                klineService.removeAllWithType(KLineType.TOR);
                 List<KLine> newKLines = new ArrayList<>();
 
                 for (String ip : ipCollection) {
@@ -66,8 +62,7 @@ public class TorServiceImpl implements TorService {
                     newKLines.add(kline);
                 }
 
-                klineService.removeAllWithType(KLineType.TOR);
-                klineList.addAll(newKLines);
+                klineService.add(newKLines);
 
                 String message = String.format("Loaded %d Tor Exit Nodes", ipCollection.size());
                 LOGGER.info(message);

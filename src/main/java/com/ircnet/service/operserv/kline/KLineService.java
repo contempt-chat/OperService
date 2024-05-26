@@ -33,6 +33,12 @@ public interface KLineService {
   void create(User from, KLine kline, Long originalDuration);
 
   /**
+   * Adds a list of K-Lines without further processing.
+   * @param klines A list of K-Lines
+   */
+  void add(List<KLine> klines);
+
+  /**
    * Finds the first K-Line that matches the given user.
    *
    * @param user An user that is connected to IRC
@@ -132,6 +138,11 @@ public interface KLineService {
    * @param type A K-Line type
    */
   void removeAllWithType(KLineType type);
+
+  /**
+   * Removes expired K-Lines.
+   */
+  void removedExpiredKLines();
 
   /**
    * TODO.

@@ -334,6 +334,11 @@ public class KLineServiceImpl implements KLineService {
     }
 
     @Override
+    public void add(List<KLine> klines) {
+        klineList.addAll(klines);
+    }
+
+    @Override
     public List<KLine> getKlineList() {
         return Collections.unmodifiableList(klineList);
     }
@@ -342,5 +347,19 @@ public class KLineServiceImpl implements KLineService {
     public void replaceKlineList(List<KLine> klines) {
         klineList.clear();
         klineList.addAll(klines);
+    }
+
+    @Override
+    public void removedExpiredKLines() {
+        List<KLine> expiredKLines = findExpired();
+
+        if(expiredKLines.isEmpty()) {
+            return;
+        }
+
+        for (KLine kline : expiredKLines) {
+            klineList.remove(kline);
+            LOGGER.debug("Removed expired K-Line for {}", kline.toHostmask());
+        }
     }
 }

@@ -2,7 +2,6 @@ package com.ircnet.service.operserv;
 
 import com.ircnet.library.common.IRCTaskService;
 import com.ircnet.library.service.IRCServiceTask;
-import com.ircnet.service.operserv.kline.KLine;
 import com.ircnet.service.operserv.kline.KLineService;
 import com.ircnet.service.operserv.kline.KLineType;
 import com.ircnet.service.operserv.persistence.PersistenceService;
@@ -10,14 +9,11 @@ import com.ircnet.service.operserv.tor.TorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.Banner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-
-import java.util.List;
 
 /**
  * Main class.
@@ -41,10 +37,6 @@ public class Application extends SpringBootServletInitializer implements Command
     @Autowired
     private TorService torService;
 
-    @Autowired
-    @Qualifier("klineList")
-    private List<KLine> klineList;
-
     public static void main(String[] args) {
         SpringApplication springApplication = new SpringApplication(Application.class);
         springApplication.setBannerMode(Banner.Mode.OFF);
@@ -65,7 +57,7 @@ public class Application extends SpringBootServletInitializer implements Command
         persistenceService.load();
 
         // Load K-Lines from webservice on first start
-        if(klineList.isEmpty()) {
+        if(klineService.getKlineList().isEmpty()) {
             klineService.loadFromAPI(null);
         }
 
