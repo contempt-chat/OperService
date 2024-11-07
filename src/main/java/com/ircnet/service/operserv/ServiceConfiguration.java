@@ -1,6 +1,6 @@
 package com.ircnet.service.operserv;
 
-import com.ircnet.library.service.IRCServiceTask;
+import com.ircnet.library.service.connection.IRCServiceConnection;
 import com.ircnet.service.operserv.squery.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -18,19 +18,13 @@ import java.util.Map;
  */
 @Configuration
 @EnableScheduling
-@ComponentScan(basePackages = {"com.ircnet.library.common", "com.ircnet.library.service"})
 public class ServiceConfiguration {
     @Autowired
     private ServiceProperties properties;
 
-    /**
-     * Creates a new IRC service.
-     *
-     * @return An IRC service
-     */
     @Bean
-    public IRCServiceTask ircServiceTask() {
-        return new IRCServiceTask(properties);
+    public IRCServiceConnection ircServiceConnection() {
+        return new IRCServiceConnection(properties);
     }
 
     @Bean

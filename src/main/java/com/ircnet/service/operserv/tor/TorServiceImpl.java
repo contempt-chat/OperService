@@ -2,7 +2,7 @@ package com.ircnet.service.operserv.tor;
 
 import com.ircnet.library.common.connection.ConnectionStatus;
 import com.ircnet.library.common.connection.IRCConnectionService;
-import com.ircnet.library.service.IRCServiceTask;
+import com.ircnet.library.service.connection.IRCServiceConnection;
 import com.ircnet.service.operserv.ScannerThread;
 import com.ircnet.service.operserv.ServiceProperties;
 import com.ircnet.service.operserv.kline.KLine;
@@ -28,7 +28,7 @@ public class TorServiceImpl implements TorService {
     private KLineService klineService;
 
     @Autowired
-    private IRCServiceTask ircServiceTask;
+    private IRCServiceConnection ircServiceConnection;
 
     @Autowired
     private IRCConnectionService ircConnectionService;
@@ -69,7 +69,7 @@ public class TorServiceImpl implements TorService {
 
                 persistenceService.save();
 
-                if (ircServiceTask.getIRCConnection().getConnectionStatus() == ConnectionStatus.REGISTERED) {
+                if (ircServiceConnection.getConnectionStatus() == ConnectionStatus.REGISTERED) {
                     //ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
 
                     ScannerThread.getInstance().runOnThread(new Runnable() {
@@ -95,8 +95,9 @@ public class TorServiceImpl implements TorService {
                             String message = String.format("Could not load Tor exit nodes from %s: %s", url, e.getMessage());
                             LOGGER.info(message);
 
-                            if (ircServiceTask.getIRCConnection().getConnectionStatus() == ConnectionStatus.REGISTERED) {
-                                ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
+                            if (ircServiceConnection.getConnectionStatus() == ConnectionStatus.REGISTERED) {
+                                // TODO
+                                ircConnectionService.notice(ircServiceConnection, properties.getChannel(), message);
                             }
 
                             return Mono.just(new ArrayList<>());

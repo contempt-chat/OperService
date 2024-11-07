@@ -2,7 +2,7 @@ package com.ircnet.service.operserv.squery;
 
 import com.ircnet.library.common.User;
 import com.ircnet.library.common.connection.IRCConnectionService;
-import com.ircnet.library.service.IRCServiceTask;
+import com.ircnet.library.service.connection.IRCServiceConnection;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public abstract class SQueryCommand {
     protected IRCConnectionService ircConnectionService;
 
     @Autowired
-    protected IRCServiceTask ircServiceTask;
+    private IRCServiceConnection ircServiceConnection;
 
     protected String commandName;
 
@@ -35,7 +35,8 @@ public abstract class SQueryCommand {
      * @param args Arguments
      */
     protected void notice(String target, String format, Object... args) {
-        ircConnectionService.notice(ircServiceTask.getIRCConnection(), target, format, args);
+        // TODO
+        ircConnectionService.notice(ircServiceConnection, target, format, args);
     }
 
     /**

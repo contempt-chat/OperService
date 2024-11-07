@@ -2,7 +2,7 @@ package com.ircnet.service.operserv.event;
 
 import com.ircnet.library.common.connection.IRCConnectionService;
 import com.ircnet.library.common.event.AbstractEventListener;
-import com.ircnet.library.service.IRCServiceTask;
+import com.ircnet.library.service.connection.IRCServiceConnection;
 import com.ircnet.library.service.event.SQueryEvent;
 import com.ircnet.service.operserv.ServiceProperties;
 import com.ircnet.service.operserv.squery.SQueryCommand;
@@ -27,7 +27,7 @@ public class SQueryEventListener extends AbstractEventListener<SQueryEvent> {
     private IRCConnectionService ircConnectionService;
 
     @Autowired
-    private IRCServiceTask ircServiceTask;
+    private IRCServiceConnection ircServiceConnection;
 
     @Autowired
     private ServiceProperties properties;
@@ -55,7 +55,8 @@ public class SQueryEventListener extends AbstractEventListener<SQueryEvent> {
         }
 
         else {
-            ircConnectionService.notice(ircServiceTask.getIRCConnection(), nick,
+            // TODO: Singleton
+            ircConnectionService.notice(ircServiceConnection, nick,
                 "Unrecognized command: \"%s\". Use /SQUERY %s HELP\n", parts[0], properties.getName());
         }
     }

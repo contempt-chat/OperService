@@ -1,7 +1,7 @@
 package com.ircnet.service.operserv;
 
-import com.ircnet.library.common.IRCTaskService;
-import com.ircnet.library.service.IRCServiceTask;
+import com.ircnet.library.common.connection.IRCConnectionService;
+import com.ircnet.library.service.connection.IRCServiceConnection;
 import com.ircnet.service.operserv.kline.KLineService;
 import com.ircnet.service.operserv.kline.KLineType;
 import com.ircnet.service.operserv.persistence.PersistenceService;
@@ -23,10 +23,10 @@ public class Application extends SpringBootServletInitializer implements Command
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
     @Autowired
-    private IRCTaskService ircTaskService;
+    private IRCConnectionService ircConnectionService;
 
     @Autowired
-    private IRCServiceTask ircServiceTask;
+    private IRCServiceConnection ircServiceConnection;
 
     @Autowired
     private KLineService klineService;
@@ -49,7 +49,7 @@ public class Application extends SpringBootServletInitializer implements Command
         Thread ircServiceThread = new Thread() {
             @Override
             public void run() {
-                ircTaskService.run(ircServiceTask);
+                ircConnectionService.run(ircServiceConnection);
             }
         };
 

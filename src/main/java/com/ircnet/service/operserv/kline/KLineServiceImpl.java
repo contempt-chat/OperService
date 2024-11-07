@@ -3,7 +3,7 @@ package com.ircnet.service.operserv.kline;
 import com.ircnet.library.common.User;
 import com.ircnet.library.common.connection.ConnectionStatus;
 import com.ircnet.library.common.connection.IRCConnectionService;
-import com.ircnet.library.service.IRCServiceTask;
+import com.ircnet.library.service.connection.IRCServiceConnection;
 import com.ircnet.library.service.user.IRCUser;
 import com.ircnet.service.operserv.ScannerThread;
 import com.ircnet.service.operserv.ServiceProperties;
@@ -44,7 +44,7 @@ public class KLineServiceImpl implements KLineService {
     private UserService userService;
 
     @Autowired
-    private IRCServiceTask ircServiceTask;
+    private IRCServiceConnection ircServiceConnection;
 
     @Autowired
     private ServiceProperties properties;
@@ -72,10 +72,12 @@ public class KLineServiceImpl implements KLineService {
         }
 
         if(from != null) {
-            ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), message.toString());
+            // TODO
+            ircConnectionService.notice(ircServiceConnection, from.getNick(), message.toString());
         }
 
-        ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message.toString());
+        // TODO
+        ircConnectionService.notice(ircServiceConnection, properties.getChannel(), message.toString());
 
         ScannerThread.getInstance().runOnThread(new Runnable() {
             @Override
@@ -121,11 +123,13 @@ public class KLineServiceImpl implements KLineService {
                     kline.getReason());
 
                 if (from != null) {
-                    ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), message);
+                    // TODO
+                    ircConnectionService.notice(ircServiceConnection, from.getNick(), message);
                 }
 
                 LOGGER.info(message);
-                ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
+                // TODO
+                ircConnectionService.notice(ircServiceConnection, properties.getChannel(), message);
 
             }
         }
@@ -138,11 +142,13 @@ public class KLineServiceImpl implements KLineService {
         if (kline.getExpirationDate() != null) {
             long timeDiff = (kline.getExpirationDate().getTime() - System.currentTimeMillis()) / 1000L;
             // TODO: convert back to wdhms to avoid overflows
-            ircConnectionService.send(ircServiceTask.getIRCConnection(), "ENCAP %s TKLINE %ss%%%s %s :%s", sid, timeDiff, kline.createFlags(), kline.toHostmask(), kline.getReason());
+            // TODO: singleton
+            ircConnectionService.send(ircServiceConnection, "ENCAP %s TKLINE %ss%%%s %s :%s", sid, timeDiff, kline.createFlags(), kline.toHostmask(), kline.getReason());
         }
         else {
             // No expiration time configured
-            ircConnectionService.send(ircServiceTask.getIRCConnection(), "ENCAP %s TKLINE 365d%%%s %s :%s", sid, kline.createFlags(), kline.toHostmask(), kline.getReason());
+            // TODO
+            ircConnectionService.send(ircServiceConnection, "ENCAP %s TKLINE 365d%%%s %s :%s", sid, kline.createFlags(), kline.toHostmask(), kline.getReason());
         }
 
     }
@@ -229,12 +235,14 @@ public class KLineServiceImpl implements KLineService {
                 .bodyToMono(new ParameterizedTypeReference<List<KLineDTO>>() {
                 })
                 .doOnError(e -> {
-                    if (ircServiceTask.getIRCConnection().getConnectionStatus() == ConnectionStatus.REGISTERED) {
+                    if (ircServiceConnection.getConnectionStatus() == ConnectionStatus.REGISTERED) {
                         String message = String.format("Could not load K-Lines: API request failed: %s", e.getMessage());
-                        ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
+                        // TODO
+                        ircConnectionService.notice(ircServiceConnection, properties.getChannel(), message);
 
                         if (from != null) {
-                            ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), message);
+                            // TODO
+                            ircConnectionService.notice(ircServiceConnection, from.getNick(), message);
                         }
                     }
                 })
@@ -251,12 +259,14 @@ public class KLineServiceImpl implements KLineService {
                             persistenceService.save();
 
 
-                            if (ircServiceTask.getIRCConnection().getConnectionStatus() == ConnectionStatus.REGISTERED) {
+                            if (ircServiceConnection.getConnectionStatus() == ConnectionStatus.REGISTERED) {
                                 String message = String.format("Loaded %d K-Lines", klineList.size());
-                                ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
+                                // TODO
+                                ircConnectionService.notice(ircServiceConnection, properties.getChannel(), message);
 
                                 if (from != null) {
-                                    ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), message);
+                                    // TODO
+                                    ircConnectionService.notice(ircServiceConnection, from.getNick(), message);
                                 }
 
                                 ScannerThread.getInstance().runOnThread(new Runnable() {
@@ -292,9 +302,10 @@ public class KLineServiceImpl implements KLineService {
         klineList.addAll(webServiceKLineList);
         persistenceService.save();
 
-        if (ircServiceTask.getIRCConnection().getConnectionStatus() == ConnectionStatus.REGISTERED) {
+        if (ircServiceConnection.getConnectionStatus() == ConnectionStatus.REGISTERED) {
             String message = String.format("Loaded %d K-Lines", klineList.size());
-            ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
+            // TODO
+            ircConnectionService.notice(ircServiceConnection, properties.getChannel(), message);
 
             ScannerThread.getInstance().runOnThread(new Runnable() {
                 @Override
@@ -313,10 +324,12 @@ public class KLineServiceImpl implements KLineService {
         String message = String.format("Removed K-Line for %s", kline.toHostmask());
 
         if(from != null) {
-            ircConnectionService.notice(ircServiceTask.getIRCConnection(), from.getNick(), message);
+            // TODO
+            ircConnectionService.notice(ircServiceConnection, from.getNick(), message);
         }
 
-        ircConnectionService.notice(ircServiceTask.getIRCConnection(), properties.getChannel(), message);
+        // TODO
+        ircConnectionService.notice(ircServiceConnection, properties.getChannel(), message);
         persistenceService.scheduleSave();
     }
 

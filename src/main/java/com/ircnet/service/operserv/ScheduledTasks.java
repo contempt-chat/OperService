@@ -1,7 +1,5 @@
 package com.ircnet.service.operserv;
 
-import com.ircnet.library.service.IRCServiceTask;
-import com.ircnet.service.operserv.kline.KLine;
 import com.ircnet.service.operserv.kline.KLineService;
 import com.ircnet.service.operserv.tor.TorService;
 import org.slf4j.Logger;
@@ -9,8 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * Contains tasks that will be executed periodically.
@@ -24,9 +20,6 @@ public class ScheduledTasks {
 
     @Autowired
     private KLineService klineService;
-
-    @Autowired
-    protected IRCServiceTask ircServiceTask;
 
     /**
      * Downloads new lists of Tor exit nodes and creates K-Lines.
