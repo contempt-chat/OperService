@@ -1,8 +1,7 @@
 package com.ircnet.service.operserv.event;
 
-import com.ircnet.library.common.connection.IRCConnectionService;
+import com.ircnet.library.common.connection.SingletonIRCConnectionService;
 import com.ircnet.library.common.event.AbstractEventListener;
-import com.ircnet.library.service.connection.IRCServiceConnection;
 import com.ircnet.library.service.event.SQueryEvent;
 import com.ircnet.service.operserv.ServiceProperties;
 import com.ircnet.service.operserv.squery.SQueryCommand;
@@ -19,24 +18,20 @@ import java.util.Map;
  * Event for SQUERY message.
  */
 @Component
-public class SQueryEventListener extends AbstractEventListener<SQueryEvent> {
+public class SQueryEventListener extends AbstractEventListener<SQueryEvent, SingletonIRCConnectionService> {
     @SuppressWarnings("unused")
     private static final Logger LOGGER = LoggerFactory.getLogger(SQueryEventListener.class);
 
-    @Autowired
-    private IRCConnectionService ircConnectionService;
-
-    @Autowired
-    private IRCServiceConnection ircServiceConnection;
-
-    @Autowired
     private ServiceProperties properties;
 
     @Qualifier("squeryCommandMap")
     @Autowired
     private Map<String, SQueryCommand> squeryCommandMap;
 
-    public SQueryEventListener() {
+    public SQueryEventListener(SingletonIRCConnectionService ircConnectionService,
+                               ServiceProperties properties) {
+        super(ircConnectionService);
+        this.properties = properties;
     }
 
     protected void onEvent(SQueryEvent event) {
@@ -55,9 +50,8 @@ public class SQueryEventListener extends AbstractEventListener<SQueryEvent> {
         }
 
         else {
-            // TODO: Singleton
-            ircConnectionService.notice(ircServiceConnection, nick,
-                "Unrecognized command: \"%s\". Use /SQUERY %s HELP\n", parts[0], properties.getName());
+            ircConnectionService.notice(nick,
+                    "Unrecognized command: \"%s\". Use /SQUERY %s HELP\n", parts[0], properties.getName());
         }
     }
 }

@@ -41,9 +41,6 @@ public class EventRegistrationService {
     public void init() {
         eventBus.setCheckInheritance(false);
 
-        /**
-         * Registration of event listeners.
-         */
         eventBus.registerEventListener(unickEventListener);
         eventBus.registerEventListener(nickChangedEventListener);
         eventBus.registerEventListener(quitEventListener);

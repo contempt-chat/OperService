@@ -1,5 +1,6 @@
 package com.ircnet.service.operserv.event;
 
+import com.ircnet.library.common.connection.IRCConnectionService;
 import com.ircnet.library.common.event.AbstractEventListener;
 import com.ircnet.library.service.event.UNickEvent;
 import com.ircnet.library.service.user.IRCUser;
@@ -15,27 +16,31 @@ import com.ircnet.service.operserv.kline.KLineService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UNickEventListener extends AbstractEventListener<UNickEvent> {
+public class UNickEventListener extends AbstractEventListener<UNickEvent, IRCConnectionService> {
     private static final Logger LOGGER = LoggerFactory.getLogger(UNickEventListener.class);
 
-    @Autowired
     private UserService userService;
-
-    @Autowired
     private ServerService serverService;
-
-    @Autowired
     private KLineService klineService;
-
-    @Autowired
     private DNSBLervice dblService;
-
-    @Autowired
     private ServiceProperties properties;
+
+    public UNickEventListener(IRCConnectionService ircConnectionService,
+                              UserService userService,
+                              ServerService serverService,
+                              KLineService klineService,
+                              DNSBLervice dblService,
+                              ServiceProperties properties) {
+        super(ircConnectionService);
+        this.userService = userService;
+        this.serverService = serverService;
+        this.klineService = klineService;
+        this.dblService = dblService;
+        this.properties = properties;
+    }
 
     protected void onEvent(UNickEvent event) {
         LOGGER.trace("UNickEvent sid={} uid={} nick={} user={} host={} ipAddress={} userModes={} account={} realName={}",
