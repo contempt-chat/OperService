@@ -41,10 +41,18 @@ public interface KLineService {
   /**
    * Finds the first K-Line that matches the given user.
    *
-   * @param user An user that is connected to IRC
+   * @param user A user that is connected to IRC
    * @return A K-Line or null if no K-Line matches
    */
   KLine findMatchingKLine(IRCUser user);
+
+  /**
+   * Finds a K-Line by web portal ID.
+   *
+   * @param webPortalId A web portal ID
+   * @return A K-Line or null
+   */
+  KLine findByWebPortalId(long webPortalId);
 
   /**
    * Finds a K-Line by ID.
@@ -52,7 +60,7 @@ public interface KLineService {
    * @param id An ID
    * @return A K-Line or null
    */
-  KLine find(long id);
+  KLine findById(String id);
 
   /**
    * Returns all K-Lines stored by this service that have not expired.

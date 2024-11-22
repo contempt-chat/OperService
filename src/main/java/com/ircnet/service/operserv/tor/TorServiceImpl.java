@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TorServiceImpl implements TorService {
@@ -52,6 +53,7 @@ public class TorServiceImpl implements TorService {
 
                 for (String ip : ipCollection) {
                     KLine kline = new KLine();
+                    kline.setId(UUID.randomUUID().toString());
                     kline.setType(KLineType.TOR);
                     kline.setUsername("*");
                     kline.setHostname(ip);

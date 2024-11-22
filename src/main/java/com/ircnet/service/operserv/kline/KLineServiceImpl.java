@@ -170,8 +170,13 @@ public class KLineServiceImpl implements KLineService {
     }
 
      @Override
-     public KLine find(long id) {
-        return klineList.stream().filter(e -> e.getId() != null && e.getId() == id).findFirst().orElse(null);
+     public KLine findByWebPortalId(long webPortalId) {
+        return klineList.stream().filter(e -> Objects.equals(e.getWebPortalId(),  webPortalId)).findFirst().orElse(null);
+    }
+
+    @Override
+    public KLine findById(String id) {
+        return klineList.stream().filter(e -> Objects.equals(e.getId(), id)).findFirst().orElse(null);
     }
 
     private boolean matchKLine(KLine kline, IRCUser user) {
@@ -342,7 +347,7 @@ public class KLineServiceImpl implements KLineService {
     public long createCheckSum() {
         return klineList.stream()
             .filter(e -> e.getType() == KLineType.WEB)
-            .map(e -> e.getId())
+            .map(e -> e.getWebPortalId())
             .collect(Collectors.summingLong(Long::longValue));
     }
 

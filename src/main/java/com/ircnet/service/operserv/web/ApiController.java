@@ -8,6 +8,7 @@ import com.ircnet.service.operserv.kline.KLineMapper;
 import com.ircnet.service.operserv.kline.KLineService;
 import com.ircnet.service.operserv.match.MatchService;
 import com.ircnet.service.operserv.web.dto.*;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,11 @@ public class ApiController {
   @Autowired
   private MatchService matchService;
 
+  @RequestMapping(value = "/k-lines", method = RequestMethod.GET)
+  public List<KLine> getKlines() {
+    return klineService.getKlineList();
+  }
+
   @RequestMapping(value = "/k-line", method = RequestMethod.POST)
   public ResponseEntity<Object> addKLine(@RequestBody KLineDTO klineDTO) {
     LOGGER.debug("Received K-Line: {}", klineDTO);
@@ -39,8 +45,16 @@ public class ApiController {
   }
 
   @RequestMapping(value = "/k-line/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<Object> deleteKLine(@PathVariable long id) {
-    KLine kline = klineService.find(id);
+  public ResponseEntity<Object> deleteKLine(@PathVariable String id) {
+    KLine kline;
+
+    if(NumberUtils.isDigits(id)) {
+      long webPortalId = Long.parseLong(id);
+      kline = klineService.findByWebPortalId(webPortalId);
+    }
+    else {
+      kline = klineService.findById(id);
+    }
 
     if (kline == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

@@ -13,9 +13,14 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class KLine {
   /**
-   * ID from webservice.
+   * Internal ID.
    */
-  private Long id;
+  private String id;
+
+  /**
+   * ID from web portal.
+   */
+  private Long webPortalId;
 
   /**
    * Username or ident.
@@ -79,7 +84,8 @@ public class KLine {
   @Override
   public String toString() {
     return "KLine{" +
-            "id=" + id +
+            "id='" + id + '\'' +
+            ", webPortalId=" + webPortalId +
             ", username='" + username + '\'' +
             ", hostname='" + hostname + '\'' +
             ", reason='" + reason + '\'' +
@@ -118,8 +124,8 @@ public class KLine {
 
   @Override
   public int hashCode() {
-    if(id != null) {
-      return id.intValue();
+    if(webPortalId != null) {
+      return webPortalId.intValue();
     }
     else {
       return super.hashCode();

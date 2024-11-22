@@ -225,6 +225,7 @@ public class DNSBLServiceImpl implements DNSBLervice {
 
   private void createKLine(DNSBLRequest request, DNSBLProvider provider, List<String> aRecords) {
     KLine kline = new KLine();
+    kline.setId(UUID.randomUUID().toString());
     kline.setType(KLineType.DNSBL);
     kline.setUsername("*");
     kline.setHostname(request.getIpAddress());

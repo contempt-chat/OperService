@@ -3,11 +3,11 @@ package com.ircnet.service.operserv.kline;
 import lombok.Data;
 
 /**
- * This class is used to synchronize K-Lines with the webservice.
+ * This class is used to synchronize K-Lines with the web portal.
  */
 @Data
 public class KLineDTO {
-  private Long id;
+  private Long webPortalId;
   private String username;
   private String hostname;
   private String reason;
@@ -20,7 +20,7 @@ public class KLineDTO {
   @Override
   public String toString() {
     return "KLineDTO{" +
-            "id=" + id +
+            "webPortalId=" + webPortalId +
             ", username='" + username + '\'' +
             ", hostname='" + hostname + '\'' +
             ", reason='" + reason + '\'' +
@@ -30,5 +30,14 @@ public class KLineDTO {
             ", saslException=" + saslException +
             ", identException=" + identException +
             '}';
+  }
+
+  public String toHostmask() {
+    if(username != null) {
+      return username + "@" + hostname;
+    }
+    else {
+      return "*@" + hostname;
+    }
   }
 }

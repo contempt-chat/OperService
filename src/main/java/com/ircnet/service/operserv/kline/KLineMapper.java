@@ -4,6 +4,7 @@ import com.ircnet.service.operserv.Util;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.UUID;
 
 public class KLineMapper {
   private KLineMapper() {
@@ -11,7 +12,8 @@ public class KLineMapper {
 
   public static KLine map(KLineDTO klineDTO) {
     KLine kline = new KLine();
-    kline.setId(klineDTO.getId());
+    kline.setId(UUID.randomUUID().toString());
+    kline.setWebPortalId(klineDTO.getWebPortalId());
     kline.setUsername(StringUtils.isNotBlank(klineDTO.getUsername()) ? klineDTO.getUsername() : "*");
     kline.setHostname(klineDTO.getHostname());
     kline.setIpAddressOrRange(Util.isIpAddressOrRange(klineDTO.getHostname()));
@@ -23,7 +25,7 @@ public class KLineMapper {
 
     kline.setCreatedBy(klineDTO.getRequestedBy());
 
-    if(klineDTO.getId() != null) {
+    if(klineDTO.getWebPortalId() != null) {
       kline.setType(KLineType.WEB);
     }
 
